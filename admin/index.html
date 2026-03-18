@@ -116,6 +116,18 @@
             width: 18px;
             height: 18px;
         }
+        
+        .user-info {
+            background: #0f172a;
+            padding: 10px 20px;
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .error { color: #ef4444; margin-top: 10px; }
+        .success { color: #10b981; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -132,16 +144,16 @@
                 <input type="password" id="loginPassword" placeholder="••••••••">
             </div>
             <button class="btn" onclick="login()"><i class="fas fa-sign-in-alt"></i> Войти</button>
-            <div id="loginError" style="color: #ef4444; margin-top: 15px;"></div>
+            <div id="loginError" class="error"></div>
         </div>
 
-        <!-- Админ-панель (скрыта до входа) -->
+        <!-- Админ-панель -->
         <div id="adminPanel" style="display: none;">
             <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
                 <h2><i class="fas fa-users-cog"></i> Управление пользователями</h2>
-                <div>
-                    <span style="margin-right: 20px;" id="currentUserDisplay"></span>
-                    <button class="btn btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+                <div class="user-info">
+                    <span id="currentUserDisplay"></span>
+                    <button class="btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти</button>
                 </div>
             </div>
 
@@ -186,6 +198,7 @@
                 </div>
                 
                 <button class="btn" onclick="addUser()"><i class="fas fa-save"></i> Добавить пользователя</button>
+                <div id="addUserMessage" class="success" style="display: none;"></div>
             </div>
 
             <!-- Список пользователей -->
@@ -208,20 +221,52 @@
     </div>
 
     <script>
+        // ============================================
+        // КОНФИГУРАЦИЯ
+        // ============================================
         const GITHUB_OWNER = 'xsibx';
         const GITHUB_REPO = 'xsibx.github.io';
         const GITHUB_USERS_PATH = 'data/users.json';
         let githubToken = localStorage.getItem('github_token') || '';
         let currentUser = null;
 
-        // Загрузка пользователей с GitHub
+        // ============================================
+        // ФУНКЦИИ ДЛЯ РАБОТЫ С КОДИРОВКОЙ
+        // ============================================
+        
+        // Декодирование base64 в UTF-8 (правильное)
+        function decodeBase64(base64) {
+            const binaryString = atob(base64.replace(/\n/g, ''));
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return new TextDecoder('utf-8').decode(bytes);
+        }
+
+        // Кодирование UTF-8 в base64
+        function encodeToBase64(str) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(str);
+            let binary = '';
+            for (let i = 0; i < data.length; i++) {
+                binary += String.fromCharCode(data[i]);
+            }
+            return btoa(binary);
+        }
+
+        // ============================================
+        // ЗАГРУЗКА И СОХРАНЕНИЕ ПОЛЬЗОВАТЕЛЕЙ
+        // ============================================
+        
         async function loadUsers() {
             try {
                 const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_USERS_PATH}`;
                 const response = await fetch(url);
                 
                 if (response.status === 404) {
-                    return {
+                    // Если файла нет, создаём базовых пользователей
+                    const defaultUsers = {
                         admin: {
                             password: "admin123",
                             role: "admin",
@@ -230,20 +275,41 @@
                             canEdit: true,
                             canDelete: true,
                             canManageUsers: true
+                        },
+                        manager: {
+                            password: "manager123",
+                            role: "manager",
+                            name: "Менеджер",
+                            canCreate: true,
+                            canEdit: true,
+                            canDelete: false,
+                            canManageUsers: false
+                        },
+                        viewer: {
+                            password: "viewer123",
+                            role: "viewer",
+                            name: "Наблюдатель",
+                            canCreate: false,
+                            canEdit: false,
+                            canDelete: false,
+                            canManageUsers: false
                         }
                     };
+                    
+                    // Сохраняем их на GitHub
+                    await saveUsers(defaultUsers);
+                    return defaultUsers;
                 }
                 
                 const data = await response.json();
-                const content = atob(data.content.replace(/\n/g, ''));
-                return JSON.parse(content);
+                const jsonString = decodeBase64(data.content);
+                return JSON.parse(jsonString);
             } catch (error) {
                 console.error('Ошибка загрузки пользователей:', error);
                 return null;
             }
         }
 
-        // Сохранение пользователей на GitHub
         async function saveUsers(users) {
             if (!githubToken) {
                 alert('Сначала введите GitHub токен');
@@ -252,7 +318,7 @@
 
             try {
                 const jsonString = JSON.stringify(users, null, 2);
-                const content = btoa(unescape(encodeURIComponent(jsonString)));
+                const content = encodeToBase64(jsonString);
                 
                 const getUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_USERS_PATH}`;
                 const getResponse = await fetch(getUrl);
@@ -284,7 +350,10 @@
             }
         }
 
-        // Вход в систему
+        // ============================================
+        // АВТОРИЗАЦИЯ
+        // ============================================
+        
         async function login() {
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
@@ -309,14 +378,19 @@
             }
         }
 
-        // Выход
         function logout() {
             localStorage.removeItem('currentUser');
             document.getElementById('loginForm').style.display = 'block';
             document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginError').innerHTML = '';
         }
 
-        // Добавление пользователя
+        // ============================================
+        // УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ
+        // ============================================
+        
         async function addUser() {
             if (!currentUser || !currentUser.canManageUsers) {
                 alert('У вас нет прав на управление пользователями');
@@ -348,7 +422,12 @@
 
             const saved = await saveUsers(users);
             if (saved) {
-                alert('✅ Пользователь добавлен');
+                document.getElementById('addUserMessage').style.display = 'block';
+                document.getElementById('addUserMessage').innerHTML = '✅ Пользователь добавлен';
+                setTimeout(() => {
+                    document.getElementById('addUserMessage').style.display = 'none';
+                }, 3000);
+                
                 renderUsersTable(users);
                 clearForm();
             } else {
@@ -356,10 +435,14 @@
             }
         }
 
-        // Удаление пользователя
         async function deleteUser(username) {
             if (!currentUser || !currentUser.canManageUsers) {
                 alert('Нет прав');
+                return;
+            }
+
+            if (username === currentUser.username) {
+                alert('Нельзя удалить самого себя');
                 return;
             }
 
@@ -380,7 +463,6 @@
             }
         }
 
-        // Отображение таблицы пользователей
         function renderUsersTable(users) {
             let html = '';
             
@@ -392,20 +474,27 @@
                 if (data.canManageUsers) rights.push('👥');
                 
                 html += `<tr>
-                    <td><strong>${username}</strong></td>
-                    <td>${data.name || username}</td>
-                    <td><span class="badge ${data.role}">${data.role}</span></td>
+                    <td><strong>${escapeHtml(username)}</strong></td>
+                    <td>${escapeHtml(data.name || username)}</td>
+                    <td><span class="badge ${data.role}">${escapeHtml(data.role)}</span></td>
                     <td>${rights.join(' ')}</td>
                     <td>
                         ${currentUser && currentUser.canManageUsers && username !== currentUser.username ? 
                             `<button class="btn-danger" style="padding: 5px 10px;" onclick="deleteUser('${username}')">
-                                <i class="fas fa-trash"></i>
+                                <i class="fas fa-trash"></i> Удалить
                             </button>` : ''}
                     </td>
                 </tr>`;
             }
             
             document.getElementById('usersTable').innerHTML = html;
+        }
+
+        // Защита от XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         function clearForm() {
@@ -419,17 +508,30 @@
             document.getElementById('permManageUsers').checked = false;
         }
 
-        // Проверка при загрузке
+        // ============================================
+        // ИНИЦИАЛИЗАЦИЯ
+        // ============================================
+        
         (async function() {
+            // Загружаем токен
+            githubToken = localStorage.getItem('github_token') || '';
+            
+            // Проверяем авторизацию
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('adminPanel').style.display = 'block';
-                document.getElementById('currentUserDisplay').innerHTML = `<i class="fas fa-user"></i> ${currentUser.name} (${currentUser.role})`;
                 
+                // Проверяем, что пользователь всё ещё существует
                 const users = await loadUsers();
-                renderUsersTable(users);
+                if (users && users[currentUser.username]) {
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('adminPanel').style.display = 'block';
+                    document.getElementById('currentUserDisplay').innerHTML = `<i class="fas fa-user"></i> ${currentUser.name} (${currentUser.role})`;
+                    renderUsersTable(users);
+                } else {
+                    // Если пользователь удалён из системы
+                    localStorage.removeItem('currentUser');
+                }
             }
         })();
     </script>
