@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профессиональная база складской недвижимости</title>
+    <title>Профессиональная база складской недвижимости с JSON</title>
     <!-- Подключаем jsPDF для генерации PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Подключаем html2canvas для конвертации изображений -->
@@ -36,6 +36,8 @@
         .btn-outline:hover { background: rgba(59,130,246,0.1); transform: none; box-shadow: none; }
         .btn-warning { background: #f59e0b; color: black; }
         .btn-warning:hover { background: #d97706; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
         
         /* Загрузка изображений */
         .image-upload-area { border: 2px dashed #334155; border-radius: 16px; padding: 20px; text-align: center; background: #0f172a; cursor: pointer; transition: 0.2s; }
@@ -71,7 +73,7 @@
         .badge.class-b { background: #3a2e1e; color: #ffa726; }
         .badge.class-c { background: #3a2a1e; color: #ff9800; }
         
-        /* Действия - кнопки */
+        /* Действия */
         .actions { display: flex; gap: 8px; flex-wrap: wrap; }
         .action-btn { background: #334155; border: none; color: #f1f5f9; width: 36px; height: 36px; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; transition: 0.2s; }
         .action-btn:hover { background: #3b82f6; transform: scale(1.1); }
@@ -93,11 +95,30 @@
         /* Миниатюры в таблице */
         .thumb-grid { display: flex; gap: 3px; flex-wrap: wrap; max-width: 100px; }
         .thumb-img { width: 30px; height: 30px; border-radius: 6px; object-fit: cover; border: 1px solid #334155; }
+
+        /* Токен секция */
+        .token-section { background: #0f172a; border-radius: 16px; padding: 20px; margin-top: 20px; border: 1px solid #334155; }
+        .token-section h4 { color: #f1f5f9; margin-top: 0; margin-bottom: 15px; font-size: 1rem; }
+        .token-input-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .token-input { flex: 1; min-width: 300px; background: #1e293b; border: 1px solid #3b82f6; color: white; padding: 12px; border-radius: 12px; }
+        .warning { color: #f59e0b; font-size: 0.9rem; margin-top: 10px; }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>🏭 <span>ПРОФЕССИОНАЛЬНАЯ БАЗА</span> Склады · Цеха · Участки</h1>
+
+    <!-- ТОКЕН СЕКЦИЯ (только для администратора) -->
+    <div class="card token-section">
+        <h4><i class="fas fa-key"></i> НАСТРОЙКА ДОСТУПА (только для администратора)</h4>
+        <div class="token-input-group">
+            <input type="password" id="githubToken" class="token-input" placeholder="Введите GitHub Personal Access Token">
+            <button class="btn btn-outline" onclick="saveToken()"><i class="fas fa-save"></i> Сохранить токен</button>
+        </div>
+        <div class="warning">
+            <i class="fas fa-exclamation-triangle"></i> Токен нужен только для сохранения объектов. Все остальные видят базу только для чтения.
+        </div>
+    </div>
 
     <!-- Форма добавления -->
     <div class="card">
@@ -200,7 +221,7 @@
         <div style="display: flex; gap: 15px; margin-top: 30px; flex-wrap: wrap;">
             <button class="btn" onclick="saveObject()" id="saveBtn"><i class="fas fa-save"></i> СОХРАНИТЬ ОБЪЕКТ</button>
             <button class="btn btn-outline" onclick="clearForm()"><i class="fas fa-eraser"></i> Очистить форму</button>
-            <button class="btn btn-warning" onclick="resetToDemo()"><i class="fas fa-undo"></i> Сбросить к тестовым</button>
+            <button class="btn btn-warning" onclick="loadFromGitHub()"><i class="fas fa-sync"></i> Обновить данные с GitHub</button>
         </div>
     </div>
 
@@ -237,75 +258,133 @@
                 </tr>
             </thead>
             <tbody id="tableBody">
-                <tr><td colspan="9" class="empty-state"><i class="fas fa-warehouse"></i> База пуста. Добавьте первый объект</td></tr>
+                <tr><td colspan="9" class="empty-state"><i class="fas fa-spinner fa-spin"></i> Загрузка данных с GitHub...</td></tr>
             </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    const STORAGE_KEY = 'industrialBaseWithImages';
+    // Конфигурация GitHub
+    const GITHUB_OWNER = 'xsibx';
+    const GITHUB_REPO = 'xsibx.github.io';
+    const GITHUB_PATH = 'data.json';
+    
     let objects = [];
     let editingId = null;
     let currentImages = [];
+    let githubToken = localStorage.getItem('github_token') || '';
 
-    // Демо-объекты
-    const demoObjects = [
-        {
-            id: 1001,
-            address: 'Складской комплекс "Северный", стр. 4',
-            dealType: 'Аренда',
-            category: 'Склад',
-            warehouseClass: 'A',
-            height: '12.5',
-            floorLoad: '8000',
-            floorType: 'Полимерный',
-            area: '3500',
-            price: '2100000',
-            power: '500',
-            gates: 'Доковые',
-            gateHeight: '5.0',
-            railway: 'Есть (тупик)',
-            heating: 'Своя котельная',
-            yearBuilt: '2018',
-            security: 'Круглосуточная',
-            ownerName: 'ООО "Северные склады"',
-            ownerPhone: '+7 (495) 123-45-67',
-            ownerEmail: 'info@north.ru',
-            ownerExtra: 'Константин',
-            images: [],
-            comment: 'Класс А, 10 ворот, пандусы, офис 200м²'
-        },
-        {
-            id: 1002,
-            address: 'Производственная база "Металлист"',
-            dealType: 'Продажа',
-            category: 'Производственный цех',
-            warehouseClass: 'B',
-            height: '9.0',
-            floorLoad: '5000',
-            floorType: 'Бетон',
-            area: '1800',
-            price: '65000000',
-            power: '380',
-            gates: 'Откатные',
-            gateHeight: '4.2',
-            railway: 'Подходит',
-            heating: 'Газовое',
-            yearBuilt: '1987',
-            security: 'Видеонаблюдение',
-            ownerName: 'Петров Иван Иванович',
-            ownerPhone: '+7 (916) 555-66-77',
-            ownerEmail: 'ivanov@mail.ru',
-            ownerExtra: 'WhatsApp',
-            images: [],
-            comment: 'Мостовой кран 10т, два пролета'
+    // Загрузка данных с GitHub
+    async function loadFromGitHub() {
+        try {
+            document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fas fa-spinner fa-spin"></i> Загрузка данных с GitHub...</td></tr>';
+            
+            const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`;
+            const response = await fetch(url);
+            
+            if (response.status === 404) {
+                // Файл не существует, создаём пустой массив
+                objects = [];
+                saveToLocalStorage();
+                renderTable();
+                return;
+            }
+            
+            const data = await response.json();
+            const content = atob(data.content.replace(/\n/g, ''));
+            objects = JSON.parse(content);
+            
+            // Конвертируем изображения обратно в формат для отображения
+            objects.forEach(obj => {
+                if (obj.images) {
+                    obj.images = obj.images.map(img => ({
+                        data: img.data,
+                        name: img.name
+                    }));
+                }
+            });
+            
+            saveToLocalStorage();
+            renderTable();
+        } catch (error) {
+            console.error('Ошибка загрузки с GitHub:', error);
+            // Если не удалось загрузить, пробуем взять из localStorage
+            loadFromLocalStorage();
         }
-    ];
+    }
+
+    // Сохранение на GitHub
+    async function saveToGitHub() {
+        if (!githubToken) {
+            alert('Сначала введите GitHub токен в разделе настроек');
+            return false;
+        }
+
+        try {
+            // Подготавливаем объекты для сохранения
+            const objectsToSave = objects.map(obj => ({
+                ...obj,
+                images: obj.images || [] // images уже в правильном формате
+            }));
+
+            const content = btoa(unescape(encodeURIComponent(JSON.stringify(objectsToSave, null, 2))));
+            
+            // Получаем текущий файл чтобы узнать его SHA
+            const getUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`;
+            const getResponse = await fetch(getUrl);
+            
+            let sha = null;
+            if (getResponse.status !== 404) {
+                const existingData = await getResponse.json();
+                sha = existingData.sha;
+            }
+
+            // Создаём или обновляем файл
+            const putUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`;
+            const putResponse = await fetch(putUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${githubToken}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: 'Обновление базы объектов',
+                    content: content,
+                    sha: sha
+                })
+            });
+
+            if (putResponse.ok) {
+                alert('✅ Данные успешно сохранены на GitHub!');
+                return true;
+            } else {
+                const error = await putResponse.json();
+                alert('❌ Ошибка сохранения: ' + error.message);
+                return false;
+            }
+        } catch (error) {
+            console.error('Ошибка сохранения на GitHub:', error);
+            alert('❌ Ошибка соединения с GitHub');
+            return false;
+        }
+    }
+
+    // Сохранение токена
+    function saveToken() {
+        const token = document.getElementById('githubToken').value.trim();
+        if (token) {
+            githubToken = token;
+            localStorage.setItem('github_token', token);
+            alert('✅ Токен сохранён');
+        } else {
+            alert('Введите токен');
+        }
+    }
 
     // Загрузка из localStorage
-    function loadFromStorage() {
-        const stored = localStorage.getItem(STORAGE_KEY);
+    function loadFromLocalStorage() {
+        const stored = localStorage.getItem('objects');
         if (stored) {
             try {
                 objects = JSON.parse(stored);
@@ -313,15 +392,17 @@
                 objects = [];
             }
         } else {
-            objects = [...demoObjects];
+            objects = [];
         }
         renderTable();
     }
 
-    function saveToStorage() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(objects));
+    // Сохранение в localStorage
+    function saveToLocalStorage() {
+        localStorage.setItem('objects', JSON.stringify(objects));
     }
 
+    // Очистка формы
     function clearForm() {
         document.getElementById('address').value = '';
         document.getElementById('dealType').value = 'Продажа';
@@ -354,6 +435,7 @@
         document.getElementById('saveBtn').innerHTML = '<i class="fas fa-save"></i> СОХРАНИТЬ ОБЪЕКТ';
     }
 
+    // Обработка загрузки изображений
     function handleImageUpload(event) {
         const files = event.target.files;
         for (let i = 0; i < files.length; i++) {
@@ -369,6 +451,7 @@
         }
     }
 
+    // Обновление превью изображений
     function updateImagePreview() {
         const container = document.getElementById('imagePreviewContainer');
         let html = '';
@@ -383,12 +466,14 @@
         container.innerHTML = html;
     }
 
+    // Удаление изображения из превью
     function removeImage(index) {
         currentImages.splice(index, 1);
         updateImagePreview();
     }
 
-    function saveObject() {
+    // Сохранение объекта
+    async function saveObject() {
         const address = document.getElementById('address').value.trim();
         if (!address) {
             alert('Введите адрес или название объекта');
@@ -427,20 +512,27 @@
             objects.push(newObj);
         }
 
-        saveToStorage();
-        clearForm();
-        renderTable();
+        saveToLocalStorage();
+        
+        // Сохраняем на GitHub
+        const saved = await saveToGitHub();
+        if (saved) {
+            clearForm();
+        }
     }
 
-    function deleteObject(id) {
+    // Удаление объекта
+    async function deleteObject(id) {
         if (confirm('Удалить объект?')) {
             objects = objects.filter(obj => obj.id !== id);
-            saveToStorage();
+            saveToLocalStorage();
+            await saveToGitHub();
             renderTable();
             if (editingId === id) clearForm();
         }
     }
 
+    // Редактирование объекта
     function editObject(id) {
         const obj = objects.find(o => o.id === id);
         if (!obj) return;
@@ -477,6 +569,7 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // Генерация PDF
     async function generatePDF(id) {
         const obj = objects.find(o => o.id === id);
         if (!obj) return;
@@ -553,15 +646,7 @@
         doc.save(`object_${obj.address.substring(0, 20)}.pdf`);
     }
 
-    function resetToDemo() {
-        if (confirm('Вернуть тестовые объекты? Все текущие данные будут заменены.')) {
-            objects = [...demoObjects];
-            saveToStorage();
-            clearForm();
-            renderTable();
-        }
-    }
-
+    // Рендер таблицы
     function renderTable() {
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         const filterType = document.getElementById('filterType').value;
@@ -635,7 +720,8 @@
         document.getElementById('tableBody').innerHTML = html;
     }
 
-    loadFromStorage();
+    // Инициализация
+    loadFromGitHub();
 </script>
 </body>
 </html>
