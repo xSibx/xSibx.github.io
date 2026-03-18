@@ -56,9 +56,18 @@
             font-weight: 600;
             cursor: pointer;
             font-size: 1rem;
+            transition: 0.2s;
+            margin-right: 10px;
         }
         
         .btn:hover { background: #2563eb; }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #3b82f6;
+            color: #f1f5f9;
+        }
+        .btn-outline:hover { background: rgba(59,130,246,0.1); }
         
         .btn-danger { background: #ef4444; }
         .btn-danger:hover { background: #dc2626; }
@@ -128,6 +137,26 @@
         
         .error { color: #ef4444; margin-top: 10px; }
         .success { color: #10b981; margin-top: 10px; }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            background: #334155;
+            border: none;
+            color: #f1f5f9;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+        
+        .action-btn:hover { background: #3b82f6; }
+        .action-btn.delete:hover { background: #ef4444; }
     </style>
 </head>
 <body>
@@ -157,9 +186,9 @@
                 </div>
             </div>
 
-            <!-- Форма добавления пользователя -->
+            <!-- Форма добавления/редактирования пользователя -->
             <div class="card">
-                <h3><i class="fas fa-user-plus"></i> Добавить нового пользователя</h3>
+                <h3><i class="fas fa-user-plus"></i> Добавить/редактировать пользователя</h3>
                 <div class="form-group">
                     <label>Логин</label>
                     <input type="text" id="newUsername" placeholder="user123">
@@ -197,8 +226,10 @@
                     </div>
                 </div>
                 
-                <button class="btn" onclick="addUser()"><i class="fas fa-save"></i> Добавить пользователя</button>
-                <div id="addUserMessage" class="success" style="display: none;"></div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn" onclick="addUser()" id="saveBtn"><i class="fas fa-save"></i> Добавить пользователя</button>
+                </div>
+                <div id="formMessage" class="success" style="display: none;"></div>
             </div>
 
             <!-- Список пользователей -->
@@ -234,7 +265,6 @@
         // ФУНКЦИИ ДЛЯ РАБОТЫ С КОДИРОВКОЙ
         // ============================================
         
-        // Декодирование base64 в UTF-8 (правильное)
         function decodeBase64(base64) {
             const binaryString = atob(base64.replace(/\n/g, ''));
             const bytes = new Uint8Array(binaryString.length);
@@ -244,7 +274,6 @@
             return new TextDecoder('utf-8').decode(bytes);
         }
 
-        // Кодирование UTF-8 в base64
         function encodeToBase64(str) {
             const encoder = new TextEncoder();
             const data = encoder.encode(str);
@@ -265,7 +294,6 @@
                 const response = await fetch(url);
                 
                 if (response.status === 404) {
-                    // Если файла нет, создаём базовых пользователей
                     const defaultUsers = {
                         admin: {
                             password: "admin123",
@@ -296,7 +324,6 @@
                         }
                     };
                     
-                    // Сохраняем их на GitHub
                     await saveUsers(defaultUsers);
                     return defaultUsers;
                 }
@@ -385,13 +412,21 @@
             document.getElementById('loginUsername').value = '';
             document.getElementById('loginPassword').value = '';
             document.getElementById('loginError').innerHTML = '';
+            resetForm();
         }
 
         // ============================================
         // УПРАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯМИ
         // ============================================
         
+        let editingUsername = null;
+
         async function addUser() {
+            if (editingUsername) {
+                alert('Сначала завершите редактирование или нажмите Отмена');
+                return;
+            }
+            
             if (!currentUser || !currentUser.canManageUsers) {
                 alert('У вас нет прав на управление пользователями');
                 return;
@@ -422,14 +457,87 @@
 
             const saved = await saveUsers(users);
             if (saved) {
-                document.getElementById('addUserMessage').style.display = 'block';
-                document.getElementById('addUserMessage').innerHTML = '✅ Пользователь добавлен';
-                setTimeout(() => {
-                    document.getElementById('addUserMessage').style.display = 'none';
-                }, 3000);
-                
+                showMessage('✅ Пользователь добавлен');
                 renderUsersTable(users);
-                clearForm();
+                resetForm();
+            } else {
+                alert('❌ Ошибка сохранения');
+            }
+        }
+
+        async function editUser(username) {
+            const users = await loadUsers();
+            const user = users[username];
+            
+            if (!user) return;
+            
+            editingUsername = username;
+            
+            document.getElementById('newUsername').value = username;
+            document.getElementById('newPassword').value = user.password;
+            document.getElementById('newName').value = user.name || username;
+            document.getElementById('newRole').value = user.role;
+            
+            document.getElementById('permCreate').checked = user.canCreate || false;
+            document.getElementById('permEdit').checked = user.canEdit || false;
+            document.getElementById('permDelete').checked = user.canDelete || false;
+            document.getElementById('permManageUsers').checked = user.canManageUsers || false;
+            
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.innerHTML = '<i class="fas fa-save"></i> Обновить пользователя';
+            saveBtn.onclick = updateUser;
+            
+            // Добавляем кнопку отмены, если её нет
+            if (!document.getElementById('cancelBtn')) {
+                const cancelBtn = document.createElement('button');
+                cancelBtn.id = 'cancelBtn';
+                cancelBtn.className = 'btn btn-outline';
+                cancelBtn.innerHTML = '<i class="fas fa-times"></i> Отмена';
+                cancelBtn.onclick = resetForm;
+                saveBtn.parentNode.appendChild(cancelBtn);
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function updateUser() {
+            if (!currentUser || !currentUser.canManageUsers) {
+                alert('У вас нет прав на управление пользователями');
+                return;
+            }
+
+            const newUsername = document.getElementById('newUsername').value.trim();
+            if (!newUsername) {
+                alert('Введите логин');
+                return;
+            }
+
+            const users = await loadUsers();
+            
+            if (editingUsername !== newUsername && users[newUsername]) {
+                alert('Пользователь с таким логином уже существует');
+                return;
+            }
+
+            if (editingUsername !== newUsername) {
+                delete users[editingUsername];
+            }
+
+            users[newUsername] = {
+                password: document.getElementById('newPassword').value || 'password',
+                role: document.getElementById('newRole').value,
+                name: document.getElementById('newName').value || newUsername,
+                canCreate: document.getElementById('permCreate').checked,
+                canEdit: document.getElementById('permEdit').checked,
+                canDelete: document.getElementById('permDelete').checked,
+                canManageUsers: document.getElementById('permManageUsers').checked
+            };
+
+            const saved = await saveUsers(users);
+            if (saved) {
+                showMessage('✅ Пользователь обновлён');
+                renderUsersTable(users);
+                resetForm();
             } else {
                 alert('❌ Ошибка сохранения');
             }
@@ -457,10 +565,40 @@
                 
                 const saved = await saveUsers(users);
                 if (saved) {
-                    alert('✅ Пользователь удален');
+                    showMessage('✅ Пользователь удален');
                     renderUsersTable(users);
+                    if (editingUsername === username) resetForm();
                 }
             }
+        }
+
+        function resetForm() {
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('newName').value = '';
+            document.getElementById('newRole').value = 'viewer';
+            document.getElementById('permCreate').checked = true;
+            document.getElementById('permEdit').checked = true;
+            document.getElementById('permDelete').checked = true;
+            document.getElementById('permManageUsers').checked = false;
+            
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.innerHTML = '<i class="fas fa-save"></i> Добавить пользователя';
+            saveBtn.onclick = addUser;
+            
+            const cancelBtn = document.getElementById('cancelBtn');
+            if (cancelBtn) cancelBtn.remove();
+            
+            editingUsername = null;
+        }
+
+        function showMessage(text) {
+            const msgDiv = document.getElementById('formMessage');
+            msgDiv.innerHTML = text;
+            msgDiv.style.display = 'block';
+            setTimeout(() => {
+                msgDiv.style.display = 'none';
+            }, 3000);
         }
 
         function renderUsersTable(users) {
@@ -478,10 +616,14 @@
                     <td>${escapeHtml(data.name || username)}</td>
                     <td><span class="badge ${data.role}">${escapeHtml(data.role)}</span></td>
                     <td>${rights.join(' ')}</td>
-                    <td>
+                    <td class="action-buttons">
+                        ${currentUser && currentUser.canManageUsers ? 
+                            `<button class="action-btn" onclick="editUser('${username}')">
+                                <i class="fas fa-edit"></i> Ред
+                            </button>` : ''}
                         ${currentUser && currentUser.canManageUsers && username !== currentUser.username ? 
-                            `<button class="btn-danger" style="padding: 5px 10px;" onclick="deleteUser('${username}')">
-                                <i class="fas fa-trash"></i> Удалить
+                            `<button class="action-btn delete" onclick="deleteUser('${username}')">
+                                <i class="fas fa-trash"></i> Уд
                             </button>` : ''}
                     </td>
                 </tr>`;
@@ -490,22 +632,10 @@
             document.getElementById('usersTable').innerHTML = html;
         }
 
-        // Защита от XSS
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
-        }
-
-        function clearForm() {
-            document.getElementById('newUsername').value = '';
-            document.getElementById('newPassword').value = '';
-            document.getElementById('newName').value = '';
-            document.getElementById('newRole').value = 'viewer';
-            document.getElementById('permCreate').checked = true;
-            document.getElementById('permEdit').checked = true;
-            document.getElementById('permDelete').checked = true;
-            document.getElementById('permManageUsers').checked = false;
         }
 
         // ============================================
@@ -513,15 +643,12 @@
         // ============================================
         
         (async function() {
-            // Загружаем токен
             githubToken = localStorage.getItem('github_token') || '';
             
-            // Проверяем авторизацию
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
                 
-                // Проверяем, что пользователь всё ещё существует
                 const users = await loadUsers();
                 if (users && users[currentUser.username]) {
                     document.getElementById('loginForm').style.display = 'none';
@@ -529,7 +656,6 @@
                     document.getElementById('currentUserDisplay').innerHTML = `<i class="fas fa-user"></i> ${currentUser.name} (${currentUser.role})`;
                     renderUsersTable(users);
                 } else {
-                    // Если пользователь удалён из системы
                     localStorage.removeItem('currentUser');
                 }
             }
