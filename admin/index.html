@@ -1,1 +1,437 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель - Управление пользователями</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
+        body { background: #0b1120; margin: 0; padding: 20px; color: #e2e8f0; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        .card {
+            background: #1e293b;
+            border-radius: 24px;
+            padding: 28px;
+            margin-bottom: 25px;
+            border: 1px solid #334155;
+        }
+        
+        h1 { color: #fff; margin-bottom: 30px; }
+        h1 span { color: #3b82f6; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #94a3b8;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #334155;
+            border-radius: 14px;
+            background: #0f172a;
+            color: #f1f5f9;
+            font-size: 0.95rem;
+        }
+        
+        input:focus, select:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+        
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn:hover { background: #2563eb; }
+        
+        .btn-danger { background: #ef4444; }
+        .btn-danger:hover { background: #dc2626; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 16px 12px;
+            text-align: left;
+            border-bottom: 2px solid #334155;
+        }
+        
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        
+        .badge.admin { background: #4a3b1e; color: #ffb74d; }
+        .badge.manager { background: #1e3a5f; color: #90caf9; }
+        .badge.viewer { background: #1e3a3a; color: #81c784; }
+        
+        .login-form {
+            max-width: 400px;
+            margin: 50px auto;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <!-- Форма входа -->
+        <div id="loginForm" class="card login-form">
+            <h2><i class="fas fa-lock"></i> Вход в админ-панель</h2>
+            <div class="form-group">
+                <label>Логин</label>
+                <input type="text" id="loginUsername" placeholder="admin">
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" id="loginPassword" placeholder="••••••••">
+            </div>
+            <button class="btn" onclick="login()"><i class="fas fa-sign-in-alt"></i> Войти</button>
+            <div id="loginError" style="color: #ef4444; margin-top: 15px;"></div>
+        </div>
 
+        <!-- Админ-панель (скрыта до входа) -->
+        <div id="adminPanel" style="display: none;">
+            <div class="card" style="display: flex; justify-content: space-between; align-items: center;">
+                <h2><i class="fas fa-users-cog"></i> Управление пользователями</h2>
+                <div>
+                    <span style="margin-right: 20px;" id="currentUserDisplay"></span>
+                    <button class="btn btn-danger" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+                </div>
+            </div>
+
+            <!-- Форма добавления пользователя -->
+            <div class="card">
+                <h3><i class="fas fa-user-plus"></i> Добавить нового пользователя</h3>
+                <div class="form-group">
+                    <label>Логин</label>
+                    <input type="text" id="newUsername" placeholder="user123">
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="text" id="newPassword" placeholder="пароль">
+                </div>
+                <div class="form-group">
+                    <label>Имя</label>
+                    <input type="text" id="newName" placeholder="Иван Петров">
+                </div>
+                <div class="form-group">
+                    <label>Роль</label>
+                    <select id="newRole">
+                        <option value="viewer">Наблюдатель</option>
+                        <option value="manager">Менеджер</option>
+                        <option value="admin">Администратор</option>
+                    </select>
+                </div>
+                
+                <h4>Права доступа</h4>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="permCreate" checked> <label>Создание объектов</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="permEdit" checked> <label>Редактирование</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="permDelete" checked> <label>Удаление</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="permManageUsers"> <label>Управление пользователями</label>
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="addUser()"><i class="fas fa-save"></i> Добавить пользователя</button>
+            </div>
+
+            <!-- Список пользователей -->
+            <div class="card">
+                <h3><i class="fas fa-list"></i> Список пользователей</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Логин</th>
+                            <th>Имя</th>
+                            <th>Роль</th>
+                            <th>Права</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GITHUB_OWNER = 'xsibx';
+        const GITHUB_REPO = 'xsibx.github.io';
+        const GITHUB_USERS_PATH = 'data/users.json';
+        let githubToken = localStorage.getItem('github_token') || '';
+        let currentUser = null;
+
+        // Загрузка пользователей с GitHub
+        async function loadUsers() {
+            try {
+                const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_USERS_PATH}`;
+                const response = await fetch(url);
+                
+                if (response.status === 404) {
+                    return {
+                        admin: {
+                            password: "admin123",
+                            role: "admin",
+                            name: "Главный администратор",
+                            canCreate: true,
+                            canEdit: true,
+                            canDelete: true,
+                            canManageUsers: true
+                        }
+                    };
+                }
+                
+                const data = await response.json();
+                const content = atob(data.content.replace(/\n/g, ''));
+                return JSON.parse(content);
+            } catch (error) {
+                console.error('Ошибка загрузки пользователей:', error);
+                return null;
+            }
+        }
+
+        // Сохранение пользователей на GitHub
+        async function saveUsers(users) {
+            if (!githubToken) {
+                alert('Сначала введите GitHub токен');
+                return false;
+            }
+
+            try {
+                const jsonString = JSON.stringify(users, null, 2);
+                const content = btoa(unescape(encodeURIComponent(jsonString)));
+                
+                const getUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_USERS_PATH}`;
+                const getResponse = await fetch(getUrl);
+                
+                let sha = null;
+                if (getResponse.status !== 404) {
+                    const existingData = await getResponse.json();
+                    sha = existingData.sha;
+                }
+
+                const putUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_USERS_PATH}`;
+                const putResponse = await fetch(putUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${githubToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Обновление пользователей',
+                        content: content,
+                        sha: sha
+                    })
+                });
+
+                return putResponse.ok;
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+                return false;
+            }
+        }
+
+        // Вход в систему
+        async function login() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            
+            const users = await loadUsers();
+            
+            if (users && users[username] && users[username].password === password) {
+                currentUser = {
+                    username: username,
+                    ...users[username]
+                };
+                
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                document.getElementById('currentUserDisplay').innerHTML = `<i class="fas fa-user"></i> ${currentUser.name} (${currentUser.role})`;
+                
+                renderUsersTable(users);
+            } else {
+                document.getElementById('loginError').innerHTML = '❌ Неверный логин или пароль';
+            }
+        }
+
+        // Выход
+        function logout() {
+            localStorage.removeItem('currentUser');
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+
+        // Добавление пользователя
+        async function addUser() {
+            if (!currentUser || !currentUser.canManageUsers) {
+                alert('У вас нет прав на управление пользователями');
+                return;
+            }
+
+            const username = document.getElementById('newUsername').value.trim();
+            if (!username) {
+                alert('Введите логин');
+                return;
+            }
+
+            const users = await loadUsers();
+            
+            if (users[username]) {
+                alert('Пользователь с таким логином уже существует');
+                return;
+            }
+
+            users[username] = {
+                password: document.getElementById('newPassword').value || 'password',
+                role: document.getElementById('newRole').value,
+                name: document.getElementById('newName').value || username,
+                canCreate: document.getElementById('permCreate').checked,
+                canEdit: document.getElementById('permEdit').checked,
+                canDelete: document.getElementById('permDelete').checked,
+                canManageUsers: document.getElementById('permManageUsers').checked
+            };
+
+            const saved = await saveUsers(users);
+            if (saved) {
+                alert('✅ Пользователь добавлен');
+                renderUsersTable(users);
+                clearForm();
+            } else {
+                alert('❌ Ошибка сохранения');
+            }
+        }
+
+        // Удаление пользователя
+        async function deleteUser(username) {
+            if (!currentUser || !currentUser.canManageUsers) {
+                alert('Нет прав');
+                return;
+            }
+
+            if (username === 'admin') {
+                alert('Нельзя удалить главного администратора');
+                return;
+            }
+
+            if (confirm(`Удалить пользователя ${username}?`)) {
+                const users = await loadUsers();
+                delete users[username];
+                
+                const saved = await saveUsers(users);
+                if (saved) {
+                    alert('✅ Пользователь удален');
+                    renderUsersTable(users);
+                }
+            }
+        }
+
+        // Отображение таблицы пользователей
+        function renderUsersTable(users) {
+            let html = '';
+            
+            for (const [username, data] of Object.entries(users)) {
+                const rights = [];
+                if (data.canCreate) rights.push('➕');
+                if (data.canEdit) rights.push('✏️');
+                if (data.canDelete) rights.push('🗑️');
+                if (data.canManageUsers) rights.push('👥');
+                
+                html += `<tr>
+                    <td><strong>${username}</strong></td>
+                    <td>${data.name || username}</td>
+                    <td><span class="badge ${data.role}">${data.role}</span></td>
+                    <td>${rights.join(' ')}</td>
+                    <td>
+                        ${currentUser && currentUser.canManageUsers && username !== currentUser.username ? 
+                            `<button class="btn-danger" style="padding: 5px 10px;" onclick="deleteUser('${username}')">
+                                <i class="fas fa-trash"></i>
+                            </button>` : ''}
+                    </td>
+                </tr>`;
+            }
+            
+            document.getElementById('usersTable').innerHTML = html;
+        }
+
+        function clearForm() {
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('newName').value = '';
+            document.getElementById('newRole').value = 'viewer';
+            document.getElementById('permCreate').checked = true;
+            document.getElementById('permEdit').checked = true;
+            document.getElementById('permDelete').checked = true;
+            document.getElementById('permManageUsers').checked = false;
+        }
+
+        // Проверка при загрузке
+        (async function() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                document.getElementById('currentUserDisplay').innerHTML = `<i class="fas fa-user"></i> ${currentUser.name} (${currentUser.role})`;
+                
+                const users = await loadUsers();
+                renderUsersTable(users);
+            }
+        })();
+    </script>
+</body>
+</html>
