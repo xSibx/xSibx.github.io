@@ -101,7 +101,7 @@
             text-decoration: none;
         }
         
-        /* Основные стили (те же, что и раньше) */
+        /* Основные стили */
         .card { background: #1e293b; border-radius: 24px; padding: 28px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); margin-bottom: 25px; border: 1px solid #334155; }
         .card h3 { color: #f1f5f9; margin-top: 0; margin-bottom: 25px; font-weight: 500; display: flex; align-items: center; gap: 10px; }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px; }
@@ -200,7 +200,7 @@
 </head>
 <body>
     <div class="container" id="app">
-        <!-- Форма входа (показывается, если не авторизован) -->
+        <!-- Форма входа -->
         <div id="loginSection" class="login-container">
             <div class="login-card">
                 <h2><i class="fas fa-warehouse"></i> База недвижимости</h2>
@@ -227,7 +227,7 @@
             </div>
         </div>
 
-        <!-- Основная база (показывается после входа) -->
+        <!-- Основная база -->
         <div id="baseSection" style="display: none;">
             <!-- Информация о пользователе -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -414,8 +414,15 @@
                 }
                 
                 const data = await response.json();
-                const content = atob(data.content.replace(/\n/g, ''));
-                return JSON.parse(content);
+                // Правильное декодирование base64
+                const base64Content = data.content.replace(/\n/g, '');
+                const binaryString = atob(base64Content);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                const jsonString = new TextDecoder('utf-8').decode(bytes);
+                return JSON.parse(jsonString);
             } catch (error) {
                 console.error('Ошибка загрузки пользователей:', error);
                 return null;
@@ -442,12 +449,10 @@
                 
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 
-                // Показываем основную базу
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('baseSection').style.display = 'block';
                 document.getElementById('userNameDisplay').innerHTML = `<i class="fas fa-user"></i> ${currentUser.name} (${currentUser.role})`;
                 
-                // Загружаем данные
                 loadFromGitHub();
             } else {
                 document.getElementById('loginError').innerHTML = '❌ Неверный логин или пароль';
@@ -495,7 +500,6 @@
         // РАБОТА С GITHUB (ДАННЫЕ)
         // ============================================
         
-        // Загрузка с GitHub
         async function loadFromGitHub() {
             try {
                 document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fas fa-spinner fa-spin"></i> Загрузка данных с GitHub...</td></tr>';
@@ -512,7 +516,7 @@
                 
                 const data = await response.json();
                 
-                // Декодирование base64 с поддержкой Unicode
+                // Правильное декодирование
                 const base64Content = data.content.replace(/\n/g, '');
                 const binaryString = atob(base64Content);
                 const bytes = new Uint8Array(binaryString.length);
@@ -539,7 +543,6 @@
             }
         }
 
-        // Сохранение на GitHub
         async function saveToGitHub() {
             if (!githubToken) {
                 alert('Сначала введите GitHub токен в разделе настроек админки');
@@ -552,7 +555,7 @@
                     images: obj.images || []
                 }));
 
-                // Кодирование с поддержкой Unicode
+                // Правильное кодирование
                 const jsonString = JSON.stringify(objectsToSave, null, 2);
                 const encoder = new TextEncoder();
                 const data = encoder.encode(jsonString);
@@ -694,7 +697,6 @@
         // ============================================
         
         async function saveObject() {
-            // Проверка прав
             if (editingId) {
                 if (!checkPermission('edit')) {
                     alert('У вас нет прав на редактирование');
@@ -946,7 +948,6 @@
                     const specs = `В:${obj.height}м Н:${obj.floorLoad}кг Э:${obj.power}кВт`;
                     const contacts = obj.ownerName !== '—' ? `${obj.ownerName} ${obj.ownerPhone}` : '—';
                     
-                    // Проверка прав для кнопок
                     const canEdit = checkPermission('edit');
                     const canDelete = checkPermission('delete');
                     
