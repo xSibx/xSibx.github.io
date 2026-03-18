@@ -1,0 +1,24 @@
+name: Автообновление базы
+
+on:
+  repository_dispatch:
+    types: [update-base]
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Download latest base
+        run: |
+          curl -L -o index.html https://xsibx.ru/latest-base.html
+          
+      - name: Commit changes
+        run: |
+          git config --global user.name "Автообновление"
+          git config --global user.email "bot@xsibx.ru"
+          git add index.html
+          git diff --quiet && git diff --staged --quiet || git commit -m "Автообновление базы"
+          git push
