@@ -11,7 +11,6 @@
     <!-- Подключаем Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Все стили из предыдущей версии - оставляем без изменений */
         * { box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
         body { background: #0b1120; margin: 0; padding: 0; }
         .container { max-width: 100%; margin: 0; padding: 0; }
@@ -148,6 +147,73 @@
             width: 100px;
         }
         
+        .filter-group select option {
+            background: #1e293b;
+        }
+        
+        /* Стили для фильтров направлений */
+        .directions-filter {
+            background: #1e293b;
+            padding: 10px 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .direction-btn {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            padding: 6px 15px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        
+        .direction-btn:hover {
+            border-color: #3b82f6;
+            color: white;
+        }
+        
+        .direction-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .districts-filter {
+            background: #1e293b;
+            padding: 10px 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .district-btn {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            padding: 6px 15px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        
+        .district-btn:hover {
+            border-color: #3b82f6;
+            color: white;
+        }
+        
+        .district-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
         .content {
             padding: 20px;
         }
@@ -232,24 +298,21 @@
         .badge.class-a { background: #4a3b1e; color: #ffb74d; }
         .badge.class-b { background: #3a2e1e; color: #ffa726; }
         .badge.class-c { background: #3a2a1e; color: #ff9800; }
+        .badge.district { background: #4a2e1e; color: #ffb74d; }
+        .badge.direction { background: #1e3a5f; color: #90caf9; }
         
         .object-address {
             font-weight: 600;
             color: white;
         }
         
-        .object-price {
-            font-weight: 700;
-            color: #10b981;
-            font-size: 1.1rem;
-        }
-        
         .object-specs {
             display: flex;
-            gap: 20px;
+            gap: 25px;
             color: #94a3b8;
             font-size: 0.9rem;
             flex-wrap: wrap;
+            align-items: center;
         }
         
         .spec-item {
@@ -261,6 +324,12 @@
         .spec-item i {
             color: #3b82f6;
             width: 16px;
+        }
+        
+        .spec-price {
+            font-weight: 700;
+            color: #10b981;
+            font-size: 1.1rem;
         }
         
         .lot-detail-page {
@@ -415,6 +484,11 @@
         }
         
         .error { color: #ef4444; margin-top: 10px; }
+        
+        .mkad-distance {
+            color: #f59e0b;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -455,6 +529,37 @@
                     <i class="fas fa-map"></i>
                     <span id="mapToggleText">Свернуть карту</span>
                 </div>
+            </div>
+
+            <!-- Фильтры по направлениям (удаленность от МКАД) -->
+            <div class="directions-filter">
+                <span style="color: #94a3b8; margin-right: 10px;">Направление от МКАД:</span>
+                <button class="direction-btn" onclick="filterByDirection('all')">Все</button>
+                <button class="direction-btn" onclick="filterByDirection('Север')">Север</button>
+                <button class="direction-btn" onclick="filterByDirection('Восток')">Восток</button>
+                <button class="direction-btn" onclick="filterByDirection('Юг')">Юг</button>
+                <button class="direction-btn" onclick="filterByDirection('Запад')">Запад</button>
+                <button class="direction-btn" onclick="filterByDirection('Северо-Восток')">С-В</button>
+                <button class="direction-btn" onclick="filterByDirection('Юго-Восток')">Ю-В</button>
+                <button class="direction-btn" onclick="filterByDirection('Северо-Запад')">С-З</button>
+                <button class="direction-btn" onclick="filterByDirection('Юго-Запад')">Ю-З</button>
+            </div>
+
+            <!-- Фильтры по округам Москвы -->
+            <div class="districts-filter">
+                <span style="color: #94a3b8; margin-right: 10px;">Округ Москвы:</span>
+                <button class="district-btn" onclick="filterByDistrict('all')">Все</button>
+                <button class="district-btn" onclick="filterByDistrict('ЦАО')">ЦАО</button>
+                <button class="district-btn" onclick="filterByDistrict('САО')">САО</button>
+                <button class="district-btn" onclick="filterByDistrict('СВАО')">СВАО</button>
+                <button class="district-btn" onclick="filterByDistrict('ВАО')">ВАО</button>
+                <button class="district-btn" onclick="filterByDistrict('ЮВАО')">ЮВАО</button>
+                <button class="district-btn" onclick="filterByDistrict('ЮАО')">ЮАО</button>
+                <button class="district-btn" onclick="filterByDistrict('ЮЗАО')">ЮЗАО</button>
+                <button class="district-btn" onclick="filterByDistrict('ЗАО')">ЗАО</button>
+                <button class="district-btn" onclick="filterByDistrict('СЗАО')">СЗАО</button>
+                <button class="district-btn" onclick="filterByDistrict('Новая Москва')">Новая Москва</button>
+                <button class="district-btn" onclick="filterByDistrict('Зеленоград')">Зеленоград</button>
             </div>
 
             <div class="filters-bar">
@@ -539,6 +644,13 @@
         let placemarks = [];
         let currentLotId = null;
         let githubToken = localStorage.getItem('github_token') || '';
+        
+        // Текущие фильтры
+        let currentDirection = 'all';
+        let currentDistrict = 'all';
+
+        // Координаты центра МКАД (примерно центр Москвы)
+        const MKAD_CENTER = [55.751244, 37.618423];
 
         // ============================================
         // ФУНКЦИИ ДЛЯ РАБОТЫ С GITHUB
@@ -563,14 +675,12 @@
             return btoa(binary);
         }
 
-        // Загрузка лотов с GitHub
         async function loadLotsFromGitHub() {
             try {
                 const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_LOTS_PATH}`;
                 const response = await fetch(url);
                 
                 if (response.status === 404) {
-                    // Если файла нет, используем тестовые данные
                     return null;
                 }
                 
@@ -583,7 +693,6 @@
             }
         }
 
-        // Сохранение лотов на GitHub
         async function saveLotsToGitHub() {
             if (!githubToken) {
                 console.warn('Нет токена GitHub, данные не сохранены');
@@ -625,11 +734,121 @@
         }
 
         // ============================================
+        // ФУНКЦИИ ДЛЯ ОПРЕДЕЛЕНИЯ НАПРАВЛЕНИЯ И ОКРУГА
+        // ============================================
+        
+        function getDirectionFromCoordinates(lat, lon) {
+            const centerLat = MKAD_CENTER[0];
+            const centerLon = MKAD_CENTER[1];
+            
+            const latDiff = lat - centerLat;
+            const lonDiff = lon - centerLon;
+            
+            // Определяем основное направление
+            let direction = '';
+            
+            if (Math.abs(latDiff) < 0.05 && Math.abs(lonDiff) < 0.05) {
+                return 'Центр';
+            }
+            
+            // Север-Юг
+            if (Math.abs(latDiff) > Math.abs(lonDiff) * 1.5) {
+                direction = latDiff > 0 ? 'Север' : 'Юг';
+            }
+            // Запад-Восток
+            else if (Math.abs(lonDiff) > Math.abs(latDiff) * 1.5) {
+                direction = lonDiff > 0 ? 'Восток' : 'Запад';
+            }
+            // Диагонали
+            else {
+                if (latDiff > 0 && lonDiff > 0) direction = 'Северо-Восток';
+                else if (latDiff > 0 && lonDiff < 0) direction = 'Северо-Запад';
+                else if (latDiff < 0 && lonDiff > 0) direction = 'Юго-Восток';
+                else if (latDiff < 0 && lonDiff < 0) direction = 'Юго-Запад';
+            }
+            
+            return direction;
+        }
+
+        function calculateDistanceFromMKAD(lat, lon) {
+            const R = 6371; // Радиус Земли в км
+            const lat1 = MKAD_CENTER[0] * Math.PI / 180;
+            const lat2 = lat * Math.PI / 180;
+            const deltaLat = (lat - MKAD_CENTER[0]) * Math.PI / 180;
+            const deltaLon = (lon - MKAD_CENTER[1]) * Math.PI / 180;
+
+            const a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
+                    Math.cos(lat1) * Math.cos(lat2) *
+                    Math.sin(deltaLon/2) * Math.sin(deltaLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const distance = R * c;
+            
+            return Math.round(distance * 10) / 10;
+        }
+
+        function getDistrictFromAddress(address) {
+            // Список округов Москвы
+            const districts = [
+                'ЦАО', 'САО', 'СВАО', 'ВАО', 'ЮВАО', 'ЮАО', 'ЮЗАО', 'ЗАО', 'СЗАО',
+                'Новая Москва', 'Зеленоград'
+            ];
+            
+            for (const district of districts) {
+                if (address.includes(district)) {
+                    return district;
+                }
+            }
+            
+            // Если адрес в Москве, но округ не указан
+            if (address.includes('Москва') || address.includes('Московская')) {
+                // Проверяем, относится ли к Новой Москве
+                if (address.includes('Новомосковский') || address.includes('Троицк')) {
+                    return 'Новая Москва';
+                }
+                if (address.includes('Зеленоград')) {
+                    return 'Зеленоград';
+                }
+            }
+            
+            return null;
+        }
+
+        // ============================================
+        // ФУНКЦИИ ДЛЯ ФИЛЬТРАЦИИ ПО НАПРАВЛЕНИЯМ И ОКРУГАМ
+        // ============================================
+        
+        function filterByDirection(direction) {
+            currentDirection = direction;
+            
+            // Обновляем активную кнопку
+            document.querySelectorAll('.direction-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(direction) || (direction === 'all' && btn.textContent === 'Все')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            filterLots();
+        }
+        
+        function filterByDistrict(district) {
+            currentDistrict = district;
+            
+            document.querySelectorAll('.district-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(district) || (district === 'all' && btn.textContent === 'Все')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            filterLots();
+        }
+
+        // ============================================
         // ГЕНЕРАЦИЯ НОМЕРА ЛОТА
         // ============================================
         
         function generateLotNumber(dealType, category) {
-            // Определяем префикс
             let prefix = '';
             if (category === 'Земельный участок') {
                 prefix = 'У';
@@ -641,9 +860,7 @@
                 prefix = 'X';
             }
             
-            // Генерируем 4-значный номер
             const randomNum = Math.floor(Math.random() * 9000) + 1000;
-            
             return prefix + randomNum.toString();
         }
 
@@ -672,7 +889,7 @@
         function initMap() {
             ymaps.ready(function() {
                 map = new ymaps.Map("map", {
-                    center: [55.751244, 37.618423],
+                    center: MKAD_CENTER,
                     zoom: 10
                 });
                 updateMapMarkers();
@@ -747,10 +964,33 @@
                 imagesHtml += '</div>';
             }
             
+            // Определяем информацию о местоположении
+            const direction = lot.direction || 'Не определено';
+            const district = lot.district || 'Не определен';
+            const distance = lot.distanceFromMKAD ? `${lot.distanceFromMKAD} км от МКАД` : '';
+            
             container.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h2 style="color: white;">Лот ${lot.lotNumber}</h2>
                     <div style="color: #94a3b8;">ID: ${lot.id}</div>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>Местоположение</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Направление от МКАД</label>
+                            <input type="text" value="${direction}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Округ (для Москвы)</label>
+                            <input type="text" value="${district}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Удаленность от МКАД</label>
+                            <input type="text" value="${distance}" readonly>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="detail-section">
@@ -890,7 +1130,6 @@
                 currentUser = { username, ...users[username] };
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 
-                // Загружаем токен, если он есть
                 const savedToken = localStorage.getItem('github_token');
                 if (savedToken) {
                     githubToken = savedToken;
@@ -926,14 +1165,11 @@
         // ============================================
         
         async function loadData() {
-            // Сначала пробуем загрузить с GitHub
             const githubLots = await loadLotsFromGitHub();
             
             if (githubLots && githubLots.length > 0) {
                 objects = githubLots;
             } else {
-                // Если нет, используем тестовые данные из lots.json (они уже должны быть на GitHub)
-                // Но на всякий случай оставляем заглушку
                 objects = [];
             }
             
@@ -963,7 +1199,14 @@
                 const matchesPrice = parseFloat(obj.price) >= minPrice && parseFloat(obj.price) <= maxPrice;
                 const matchesArea = parseFloat(obj.area) >= minArea;
                 
-                return matchesSearch && matchesType && matchesCategory && matchesClass && matchesPrice && matchesArea;
+                // Фильтр по направлению
+                const matchesDirection = currentDirection === 'all' || obj.direction === currentDirection;
+                
+                // Фильтр по округу
+                const matchesDistrict = currentDistrict === 'all' || obj.district === currentDistrict;
+                
+                return matchesSearch && matchesType && matchesCategory && matchesClass && 
+                       matchesPrice && matchesArea && matchesDirection && matchesDistrict;
             });
             
             renderObjects(filtered);
@@ -978,6 +1221,21 @@
             document.getElementById('maxPrice').value = '';
             document.getElementById('minArea').value = '';
             document.getElementById('searchInput').value = '';
+            
+            // Сбрасываем фильтры направлений и округов
+            currentDirection = 'all';
+            currentDistrict = 'all';
+            
+            document.querySelectorAll('.direction-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === 'Все') btn.classList.add('active');
+            });
+            
+            document.querySelectorAll('.district-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === 'Все') btn.classList.add('active');
+            });
+            
             filterLots();
         }
 
@@ -990,6 +1248,17 @@
             let html = '';
             
             lots.forEach(lot => {
+                // Определяем бейдж для местоположения
+                let locationBadge = '';
+                if (lot.district && lot.district !== 'Не определен') {
+                    locationBadge = `<span class="badge district">${lot.district}</span>`;
+                } else if (lot.direction && lot.direction !== 'Не определено') {
+                    locationBadge = `<span class="badge direction">${lot.direction}</span>`;
+                    if (lot.distanceFromMKAD) {
+                        locationBadge += `<span class="mkad-distance"> ${lot.distanceFromMKAD} км</span>`;
+                    }
+                }
+                
                 html += `
                     <div class="object-item" onclick="showLotDetail(${lot.id})">
                         <div class="object-main">
@@ -999,17 +1268,17 @@
                                     <span class="badge ${lot.dealType === 'Продажа' ? 'sale' : 'rent'}">${lot.dealType}</span>
                                     ${lot.warehouseClass !== 'Не применимо' ? 
                                         `<span class="badge class-${lot.warehouseClass.toLowerCase()}">${lot.warehouseClass}</span>` : ''}
+                                    ${locationBadge}
                                 </div>
                                 <div class="object-address">${lot.address}</div>
                             </div>
                             
-                            <div class="object-price">${Number(lot.price).toLocaleString()} ₽</div>
-                            
                             <div class="object-specs">
-                                <div class="spec-item"><i class="fas fa-arrows-alt-v"></i> ${lot.height} м</div>
-                                <div class="spec-item"><i class="fas fa-weight-hanging"></i> ${lot.floorLoad} кг/м²</div>
-                                <div class="spec-item"><i class="fas fa-bolt"></i> ${lot.power} кВт</div>
+                                <div class="spec-price">${Number(lot.price).toLocaleString()} ₽</div>
                                 <div class="spec-item"><i class="fas fa-vector-square"></i> ${lot.area} м²</div>
+                                <div class="spec-item"><i class="fas fa-bolt"></i> ${lot.power} кВт</div>
+                                <div class="spec-item"><i class="fas fa-fire"></i> ${lot.heating}</div>
+                                <div class="spec-item"><i class="fas fa-arrows-alt-v"></i> ${lot.height} м</div>
                             </div>
                         </div>
                     </div>
@@ -1057,7 +1326,10 @@
                 ownerExtra: "",
                 images: [],
                 comment: "",
-                coordinates: [55.751244, 37.618423]
+                coordinates: MKAD_CENTER,
+                direction: "Центр",
+                district: null,
+                distanceFromMKAD: 0
             };
             
             objects.push(newLot);
@@ -1105,6 +1377,13 @@
                 lot.lotNumber = generateLotNumber(lot.dealType, lot.category);
             }
             
+            // Обновляем информацию о местоположении, если есть координаты
+            if (lot.coordinates) {
+                lot.direction = getDirectionFromCoordinates(lot.coordinates[0], lot.coordinates[1]);
+                lot.distanceFromMKAD = calculateDistanceFromMKAD(lot.coordinates[0], lot.coordinates[1]);
+                lot.district = getDistrictFromAddress(lot.address);
+            }
+            
             saveLotsToGitHub().then(() => {
                 renderObjects(objects);
                 updateMapMarkers();
@@ -1142,7 +1421,6 @@
                         name: files[i].name
                     });
                     
-                    // Обновляем превью
                     const previewDiv = document.getElementById('detail_preview');
                     const img = document.createElement('img');
                     img.src = e.target.result;
@@ -1200,6 +1478,15 @@
             doc.setFontSize(14);
             doc.text(`Адрес: ${lot.address}`, 20, yPos);
             yPos += 10;
+            
+            // Информация о местоположении
+            if (lot.district) {
+                doc.text(`Округ: ${lot.district}`, 20, yPos);
+                yPos += 8;
+            } else if (lot.direction) {
+                doc.text(`Направление: ${lot.direction} (${lot.distanceFromMKAD} км от МКАД)`, 20, yPos);
+                yPos += 8;
+            }
             
             doc.setFontSize(12);
             doc.text(`Тип сделки: ${lot.dealType}`, 20, yPos);
