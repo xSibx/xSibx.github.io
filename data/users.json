@@ -1,0 +1,29 @@
+{
+  "admin": {
+    "password": "admin123",
+    "role": "admin",
+    "name": "Главный администратор",
+    "canCreate": true,
+    "canEdit": true,
+    "canDelete": true,
+    "canManageUsers": true
+  },
+  "manager": {
+    "password": "manager123",
+    "role": "manager",
+    "name": "Менеджер",
+    "canCreate": true,
+    "canEdit": true,
+    "canDelete": false,
+    "canManageUsers": false
+  },
+  "viewer": {
+    "password": "viewer123",
+    "role": "viewer",
+    "name": "Наблюдатель",
+    "canCreate": false,
+    "canEdit": false,
+    "canDelete": false,
+    "canManageUsers": false
+  }
+}
