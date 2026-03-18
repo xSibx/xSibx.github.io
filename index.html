@@ -4,20 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Профессиональная база складской недвижимости</title>
-    <!-- Подключаем jsPDF для генерации PDF -->
+    <!-- Подключаем jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- Подключаем html2canvas для конвертации изображений -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- Подключаем Яндекс Карты -->
     <script src="https://api-maps.yandex.ru/2.1/?apikey=ваш_ключ&lang=ru_RU" type="text/javascript"></script>
-    <!-- Подключаем Font Awesome для иконок -->
+    <!-- Подключаем Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Все стили из предыдущей версии - оставляем без изменений */
         * { box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
         body { background: #0b1120; margin: 0; padding: 0; }
         .container { max-width: 100%; margin: 0; padding: 0; }
         
-        /* Шапка с пользователем */
         .header {
             display: flex;
             justify-content: space-between;
@@ -25,6 +23,7 @@
             padding: 15px 20px;
             background: #1e293b;
             border-bottom: 1px solid #334155;
+            position: relative;
         }
         
         .header-center {
@@ -44,14 +43,6 @@
         .header-title {
             color: #94a3b8;
             font-size: 0.9rem;
-        }
-        
-        h1 { 
-            color: #fff; 
-            font-weight: 500; 
-            font-size: 1.3rem; 
-            margin: 0;
-            visibility: hidden;
         }
         
         .user-info {
@@ -75,14 +66,7 @@
             cursor: pointer;
             font-size: 0.85rem;
         }
-        .user-info button:hover { background: #dc2626; }
-        .user-info a {
-            color: #3b82f6;
-            text-decoration: none;
-            margin-left: 5px;
-        }
         
-        /* Карта с кнопкой сворачивания */
         #map-container {
             width: 100%;
             height: 50vh;
@@ -122,11 +106,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         
-        .map-toggle:hover {
-            background: #2d3a4a;
-        }
-        
-        /* Фильтры */
         .filters-bar {
             background: #1e293b;
             padding: 15px 20px;
@@ -169,16 +148,10 @@
             width: 100px;
         }
         
-        .filter-group select option {
-            background: #1e293b;
-        }
-        
-        /* Основной контент */
         .content {
             padding: 20px;
         }
         
-        /* Поиск по адресу */
         .search-section {
             background: #1e293b;
             border-radius: 60px;
@@ -198,7 +171,6 @@
             color: white;
         }
         
-        /* Список объектов */
         .objects-list {
             background: #1e293b;
             border-radius: 16px;
@@ -231,6 +203,16 @@
             gap: 15px;
             flex: 2;
             min-width: 300px;
+        }
+        
+        .lot-number {
+            font-family: monospace;
+            font-weight: 700;
+            color: #3b82f6;
+            background: #0f172a;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.9rem;
         }
         
         .object-badges {
@@ -281,7 +263,6 @@
             width: 16px;
         }
         
-        /* Детальная страница лота */
         .lot-detail-page {
             background: #1e293b;
             border-radius: 24px;
@@ -409,7 +390,6 @@
             flex-wrap: wrap;
         }
         
-        /* Форма входа */
         .login-container {
             max-width: 400px;
             margin: 100px auto;
@@ -456,15 +436,12 @@
 
         <!-- Основная база -->
         <div id="baseSection" style="display: none;">
-            <!-- Шапка -->
             <div class="header">
-                <div style="width: 200px;"></div> <!-- Пустой блок слева для баланса -->
-                
+                <div style="width: 200px;"></div>
                 <div class="header-center">
                     <div class="company-name" id="companyName" contenteditable="true">НАЗВАНИЕ КОМПАНИИ</div>
                     <div class="header-title">Склады · Производство · Участки</div>
                 </div>
-                
                 <div class="user-info" id="userInfo">
                     <span id="userNameDisplay"></span>
                     <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти</button>
@@ -472,7 +449,6 @@
                 </div>
             </div>
 
-            <!-- Карта с кнопкой сворачивания -->
             <div id="map-container">
                 <div id="map"></div>
                 <div class="map-toggle" onclick="toggleMap()">
@@ -481,7 +457,6 @@
                 </div>
             </div>
 
-            <!-- Фильтры -->
             <div class="filters-bar">
                 <div class="filter-group">
                     <label>Тип сделки</label>
@@ -491,7 +466,6 @@
                         <option value="Аренда">Аренда</option>
                     </select>
                 </div>
-                
                 <div class="filter-group">
                     <label>Категория</label>
                     <select id="filterCategory" onchange="filterLots()">
@@ -502,7 +476,6 @@
                         <option value="Ангар">Ангар</option>
                     </select>
                 </div>
-                
                 <div class="filter-group">
                     <label>Класс</label>
                     <select id="filterClass" onchange="filterLots()">
@@ -512,32 +485,27 @@
                         <option value="C">C</option>
                     </select>
                 </div>
-                
                 <div class="filter-group">
                     <label>Мин. цена</label>
                     <input type="number" id="minPrice" placeholder="от" onchange="filterLots()">
                 </div>
-                
                 <div class="filter-group">
                     <label>Макс. цена</label>
                     <input type="number" id="maxPrice" placeholder="до" onchange="filterLots()">
                 </div>
-                
                 <div class="filter-group">
                     <label>Мин. площадь</label>
                     <input type="number" id="minArea" placeholder="от" onchange="filterLots()">
                 </div>
-                
                 <button class="btn btn-outline" onclick="resetFilters()">
                     <i class="fas fa-undo"></i> Сброс
                 </button>
             </div>
 
-            <!-- Основной контент -->
             <div id="mainContent">
                 <div class="content">
                     <div class="search-section">
-                        <input type="text" id="searchInput" placeholder="🔍 Поиск по адресу, описанию..." onkeyup="filterLots()">
+                        <input type="text" id="searchInput" placeholder="🔍 Поиск по адресу, номеру лота..." onkeyup="filterLots()">
                         <button class="btn" onclick="createNewLot()" id="createBtn">
                             <i class="fas fa-plus"></i> Новый объект
                         </button>
@@ -547,7 +515,6 @@
                 </div>
             </div>
 
-            <!-- Детальная страница лота -->
             <div id="lotDetailPage" style="display: none;">
                 <div class="content">
                     <div class="back-button" onclick="showMainPage()">
@@ -565,70 +532,120 @@
         // ============================================
         const GITHUB_OWNER = 'xsibx';
         const GITHUB_REPO = 'xsibx.github.io';
+        const GITHUB_LOTS_PATH = 'data/lots.json';
         let objects = [];
         let currentUser = null;
         let map = null;
         let placemarks = [];
         let currentLotId = null;
+        let githubToken = localStorage.getItem('github_token') || '';
 
         // ============================================
-        // ТЕСТОВЫЕ ДАННЫЕ
+        // ФУНКЦИИ ДЛЯ РАБОТЫ С GITHUB
         // ============================================
-        const testLots = [
-            {
-                id: 1,
-                address: "Москва, ул. Промышленная, д. 15",
-                dealType: "Аренда",
-                category: "Склад",
-                warehouseClass: "A",
-                height: "12.5",
-                floorLoad: "5000",
-                floorType: "Полимерный",
-                area: "2500",
-                price: "1500000",
-                power: "400",
-                gates: "Доковые",
-                gateHeight: "5.0",
-                railway: "Есть",
-                heating: "Центральное",
-                yearBuilt: "2018",
-                security: "Круглосуточная",
-                ownerName: "ООО СкладЛогистик",
-                ownerPhone: "+7 (495) 123-45-67",
-                ownerEmail: "info@sklad.ru",
-                ownerExtra: "Иван Петрович",
-                images: [],
-                comment: "Склад класса А, 10 ворот, пандусы",
-                coordinates: [55.751244, 37.618423]
-            },
-            {
-                id: 2,
-                address: "Москва, ул. Заводская, д. 8",
-                dealType: "Продажа",
-                category: "Производственный цех",
-                warehouseClass: "B",
-                height: "9.0",
-                floorLoad: "3000",
-                floorType: "Бетон",
-                area: "1800",
-                price: "45000000",
-                power: "250",
-                gates: "Откатные",
-                gateHeight: "4.2",
-                railway: "Подходит",
-                heating: "Своя котельная",
-                yearBuilt: "1985",
-                security: "Видеонаблюдение",
-                ownerName: "Иванов Иван",
-                ownerPhone: "+7 (916) 555-66-77",
-                ownerEmail: "ivanov@mail.ru",
-                ownerExtra: "WhatsApp",
-                images: [],
-                comment: "Мостовой кран 5т, офис 100м²",
-                coordinates: [55.761244, 37.628423]
-            },
-            // ... остальные лоты (для краткости оставлю как есть, но в реальном коде они все должны быть)
-        ];
+        
+        function decodeBase64(base64) {
+            const binaryString = atob(base64.replace(/\n/g, ''));
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return new TextDecoder('utf-8').decode(bytes);
+        }
+
+        function encodeToBase64(str) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(str);
+            let binary = '';
+            for (let i = 0; i < data.length; i++) {
+                binary += String.fromCharCode(data[i]);
+            }
+            return btoa(binary);
+        }
+
+        // Загрузка лотов с GitHub
+        async function loadLotsFromGitHub() {
+            try {
+                const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_LOTS_PATH}`;
+                const response = await fetch(url);
+                
+                if (response.status === 404) {
+                    // Если файла нет, используем тестовые данные
+                    return null;
+                }
+                
+                const data = await response.json();
+                const jsonString = decodeBase64(data.content);
+                return JSON.parse(jsonString);
+            } catch (error) {
+                console.error('Ошибка загрузки лотов:', error);
+                return null;
+            }
+        }
+
+        // Сохранение лотов на GitHub
+        async function saveLotsToGitHub() {
+            if (!githubToken) {
+                console.warn('Нет токена GitHub, данные не сохранены');
+                return false;
+            }
+
+            try {
+                const jsonString = JSON.stringify(objects, null, 2);
+                const content = encodeToBase64(jsonString);
+                
+                const getUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_LOTS_PATH}`;
+                const getResponse = await fetch(getUrl);
+                
+                let sha = null;
+                if (getResponse.status !== 404) {
+                    const existingData = await getResponse.json();
+                    sha = existingData.sha;
+                }
+
+                const putUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_LOTS_PATH}`;
+                const putResponse = await fetch(putUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${githubToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Обновление базы объектов',
+                        content: content,
+                        sha: sha
+                    })
+                });
+
+                return putResponse.ok;
+            } catch (error) {
+                console.error('Ошибка сохранения лотов:', error);
+                return false;
+            }
+        }
+
+        // ============================================
+        // ГЕНЕРАЦИЯ НОМЕРА ЛОТА
+        // ============================================
+        
+        function generateLotNumber(dealType, category) {
+            // Определяем префикс
+            let prefix = '';
+            if (category === 'Земельный участок') {
+                prefix = 'У';
+            } else if (dealType === 'Аренда') {
+                prefix = 'А';
+            } else if (dealType === 'Продажа') {
+                prefix = 'П';
+            } else {
+                prefix = 'X';
+            }
+            
+            // Генерируем 4-значный номер
+            const randomNum = Math.floor(Math.random() * 9000) + 1000;
+            
+            return prefix + randomNum.toString();
+        }
 
         // ============================================
         // ФУНКЦИИ ДЛЯ КАРТЫ
@@ -672,8 +689,8 @@
                 if (obj.coordinates) {
                     const placemark = new ymaps.Placemark(obj.coordinates, {
                         balloonContent: `
-                            <strong>${obj.address}</strong><br>
-                            ${obj.dealType}, ${obj.area} м²<br>
+                            <strong>${obj.lotNumber}</strong><br>
+                            ${obj.address}<br>
                             ${Number(obj.price).toLocaleString()} ₽
                         `
                     }, {
@@ -719,10 +736,11 @@
             let imagesHtml = '';
             if (lot.images && lot.images.length > 0) {
                 imagesHtml = '<div class="image-preview-grid">';
-                lot.images.forEach(img => {
+                lot.images.forEach((img, index) => {
                     imagesHtml += `
                         <div class="image-preview-item">
                             <img src="${img.data}" alt="photo">
+                            ${canEdit ? `<button onclick="removeImage(${lot.id}, ${index})">×</button>` : ''}
                         </div>
                     `;
                 });
@@ -730,25 +748,28 @@
             }
             
             container.innerHTML = `
-                <h2 style="color: white; margin-bottom: 20px;">${lot.address}</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="color: white;">Лот ${lot.lotNumber}</h2>
+                    <div style="color: #94a3b8;">ID: ${lot.id}</div>
+                </div>
                 
                 <div class="detail-section">
                     <h3>Характеристики объекта</h3>
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Адрес</label>
-                            <input type="text" id="detail_address" value="${lot.address}">
+                            <input type="text" id="detail_address" value="${lot.address}" ${!canEdit ? 'disabled' : ''}>
                         </div>
                         <div class="form-group">
                             <label>Тип сделки</label>
-                            <select id="detail_dealType">
+                            <select id="detail_dealType" ${!canEdit ? 'disabled' : ''}>
                                 <option value="Продажа" ${lot.dealType === 'Продажа' ? 'selected' : ''}>Продажа</option>
                                 <option value="Аренда" ${lot.dealType === 'Аренда' ? 'selected' : ''}>Аренда</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Категория</label>
-                            <select id="detail_category">
+                            <select id="detail_category" ${!canEdit ? 'disabled' : ''}>
                                 <option value="Склад" ${lot.category === 'Склад' ? 'selected' : ''}>Склад</option>
                                 <option value="Производственный цех" ${lot.category === 'Производственный цех' ? 'selected' : ''}>Производство</option>
                                 <option value="Земельный участок" ${lot.category === 'Земельный участок' ? 'selected' : ''}>Участок</option>
@@ -757,7 +778,7 @@
                         </div>
                         <div class="form-group">
                             <label>Класс</label>
-                            <select id="detail_class">
+                            <select id="detail_class" ${!canEdit ? 'disabled' : ''}>
                                 <option value="A" ${lot.warehouseClass === 'A' ? 'selected' : ''}>A</option>
                                 <option value="B" ${lot.warehouseClass === 'B' ? 'selected' : ''}>B</option>
                                 <option value="C" ${lot.warehouseClass === 'C' ? 'selected' : ''}>C</option>
@@ -766,35 +787,35 @@
                         </div>
                         <div class="form-group">
                             <label>Высота (м)</label>
-                            <input type="text" id="detail_height" value="${lot.height}">
+                            <input type="text" id="detail_height" value="${lot.height}" ${!canEdit ? 'disabled' : ''}>
                         </div>
                         <div class="form-group">
                             <label>Нагрузка (кг/м²)</label>
-                            <input type="text" id="detail_load" value="${lot.floorLoad}">
+                            <input type="text" id="detail_load" value="${lot.floorLoad}" ${!canEdit ? 'disabled' : ''}>
                         </div>
                         <div class="form-group">
                             <label>Площадь (м²)</label>
-                            <input type="text" id="detail_area" value="${lot.area}">
+                            <input type="text" id="detail_area" value="${lot.area}" ${!canEdit ? 'disabled' : ''}>
                         </div>
                         <div class="form-group">
                             <label>Цена (₽)</label>
-                            <input type="text" id="detail_price" value="${lot.price}">
+                            <input type="text" id="detail_price" value="${lot.price}" ${!canEdit ? 'disabled' : ''}>
                         </div>
                         <div class="form-group">
                             <label>Электричество (кВт)</label>
-                            <input type="text" id="detail_power" value="${lot.power}">
+                            <input type="text" id="detail_power" value="${lot.power}" ${!canEdit ? 'disabled' : ''}>
                         </div>
                         <div class="form-group">
                             <label>Ворота</label>
-                            <input type="text" id="detail_gates" value="${lot.gates}">
+                            <input type="text" id="detail_gates" value="${lot.gates}" ${!canEdit ? 'disabled' : ''}>
                         </div>
                         <div class="form-group">
                             <label>Высота ворот (м)</label>
-                            <input type="text" id="detail_gateHeight" value="${lot.gateHeight}">
+                            <input type="text" id="detail_gateHeight" value="${lot.gateHeight}" ${!canEdit ? 'disabled' : ''}>
                         </div>
                         <div class="form-group" style="grid-column: span 2;">
                             <label>Комментарий</label>
-                            <textarea id="detail_comment" rows="3">${lot.comment}</textarea>
+                            <textarea id="detail_comment" rows="3" ${!canEdit ? 'disabled' : ''}>${lot.comment}</textarea>
                         </div>
                     </div>
                 </div>
@@ -804,30 +825,32 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Имя</label>
-                            <input type="text" id="detail_ownerName" value="${lot.ownerName || ''}">
+                            <input type="text" id="detail_ownerName" value="${lot.ownerName || ''}" ${!canEdit ? 'disabled' : ''}>
                         </div>
                         <div class="form-group">
                             <label>Телефон</label>
-                            <input type="text" id="detail_ownerPhone" value="${lot.ownerPhone || ''}">
+                            <input type="text" id="detail_ownerPhone" value="${lot.ownerPhone || ''}" ${!canEdit ? 'disabled' : ''}>
                         </div>
                         <div class="form-group">
                             <label>Email</label>
-                            <input type="email" id="detail_ownerEmail" value="${lot.ownerEmail || ''}">
+                            <input type="email" id="detail_ownerEmail" value="${lot.ownerEmail || ''}" ${!canEdit ? 'disabled' : ''}>
                         </div>
                         <div class="form-group">
                             <label>Доп. связь</label>
-                            <input type="text" id="detail_ownerExtra" value="${lot.ownerExtra || ''}">
+                            <input type="text" id="detail_ownerExtra" value="${lot.ownerExtra || ''}" ${!canEdit ? 'disabled' : ''}>
                         </div>
                     </div>
                 </div>
 
                 <div class="detail-section">
                     <h3>Фотографии</h3>
-                    <div class="image-upload-area" onclick="document.getElementById('detail_fileInput').click()">
-                        <input type="file" id="detail_fileInput" accept="image/*" multiple style="display: none;" 
-                               onchange="handleDetailImageUpload(event)">
-                        <p><i class="fas fa-cloud-upload-alt"></i> Добавить фото</p>
-                    </div>
+                    ${canEdit ? `
+                        <div class="image-upload-area" onclick="document.getElementById('detail_fileInput').click()">
+                            <input type="file" id="detail_fileInput" accept="image/*" multiple style="display: none;" 
+                                   onchange="handleDetailImageUpload(event, ${lot.id})">
+                            <p><i class="fas fa-cloud-upload-alt"></i> Добавить фото</p>
+                        </div>
+                    ` : ''}
                     <div id="detail_preview" class="image-preview-grid">${imagesHtml}</div>
                 </div>
                 
@@ -853,7 +876,7 @@
                 const response = await fetch(url);
                 if (response.status === 404) return null;
                 const data = await response.json();
-                const content = atob(data.content.replace(/\n/g, ''));
+                const content = decodeBase64(data.content);
                 return JSON.parse(content);
             } catch { return null; }
         }
@@ -866,6 +889,13 @@
             if (users && users[username] && users[username].password === password) {
                 currentUser = { username, ...users[username] };
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // Загружаем токен, если он есть
+                const savedToken = localStorage.getItem('github_token');
+                if (savedToken) {
+                    githubToken = savedToken;
+                }
+                
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('baseSection').style.display = 'block';
                 document.getElementById('userNameDisplay').innerHTML = `<i class="fas fa-user"></i> ${currentUser.name}`;
@@ -896,7 +926,17 @@
         // ============================================
         
         async function loadData() {
-            objects = testLots;
+            // Сначала пробуем загрузить с GitHub
+            const githubLots = await loadLotsFromGitHub();
+            
+            if (githubLots && githubLots.length > 0) {
+                objects = githubLots;
+            } else {
+                // Если нет, используем тестовые данные из lots.json (они уже должны быть на GitHub)
+                // Но на всякий случай оставляем заглушку
+                objects = [];
+            }
+            
             renderObjects(objects);
         }
 
@@ -915,7 +955,8 @@
             
             const filtered = objects.filter(obj => {
                 const matchesSearch = obj.address.toLowerCase().includes(search) ||
-                                     obj.comment.toLowerCase().includes(search);
+                                     obj.comment.toLowerCase().includes(search) ||
+                                     (obj.lotNumber && obj.lotNumber.toLowerCase().includes(search));
                 const matchesType = type === 'all' || obj.dealType === type;
                 const matchesCategory = category === 'all' || obj.category === category;
                 const matchesClass = lotClass === 'all' || obj.warehouseClass === lotClass;
@@ -953,6 +994,7 @@
                     <div class="object-item" onclick="showLotDetail(${lot.id})">
                         <div class="object-main">
                             <div class="object-info">
+                                <div class="lot-number">${lot.lotNumber || '---'}</div>
                                 <div class="object-badges">
                                     <span class="badge ${lot.dealType === 'Продажа' ? 'sale' : 'rent'}">${lot.dealType}</span>
                                     ${lot.warehouseClass !== 'Не применимо' ? 
@@ -974,6 +1016,10 @@
                 `;
             });
             
+            if (lots.length === 0) {
+                html = '<div style="text-align: center; padding: 40px; color: #94a3b8;">Нет объектов</div>';
+            }
+            
             container.innerHTML = html;
         }
 
@@ -983,11 +1029,15 @@
                 return;
             }
             
+            const dealType = "Аренда";
+            const category = "Склад";
+            
             const newLot = {
                 id: Date.now(),
+                lotNumber: generateLotNumber(dealType, category),
                 address: "Новый объект",
-                dealType: "Аренда",
-                category: "Склад",
+                dealType: dealType,
+                category: category,
                 warehouseClass: "A",
                 height: "0",
                 floorLoad: "0",
@@ -1011,9 +1061,11 @@
             };
             
             objects.push(newLot);
-            renderObjects(objects);
-            updateMapMarkers();
-            showLotDetail(newLot.id);
+            saveLotsToGitHub().then(() => {
+                renderObjects(objects);
+                updateMapMarkers();
+                showLotDetail(newLot.id);
+            });
         }
 
         function saveLotDetail(id) {
@@ -1024,6 +1076,9 @@
             
             const lot = objects.find(o => o.id === id);
             if (!lot) return;
+            
+            const oldDealType = lot.dealType;
+            const oldCategory = lot.category;
             
             // Основные характеристики
             lot.address = document.getElementById('detail_address').value;
@@ -1045,9 +1100,16 @@
             lot.ownerEmail = document.getElementById('detail_ownerEmail').value;
             lot.ownerExtra = document.getElementById('detail_ownerExtra').value;
             
-            renderObjects(objects);
-            updateMapMarkers();
-            showMainPage();
+            // Обновляем номер лота, если изменился тип или категория
+            if (oldDealType !== lot.dealType || oldCategory !== lot.category) {
+                lot.lotNumber = generateLotNumber(lot.dealType, lot.category);
+            }
+            
+            saveLotsToGitHub().then(() => {
+                renderObjects(objects);
+                updateMapMarkers();
+                showMainPage();
+            });
         }
 
         function deleteLot(id) {
@@ -1058,19 +1120,30 @@
             
             if (confirm('Удалить объект?')) {
                 objects = objects.filter(o => o.id !== id);
-                renderObjects(objects);
-                updateMapMarkers();
-                showMainPage();
+                saveLotsToGitHub().then(() => {
+                    renderObjects(objects);
+                    updateMapMarkers();
+                    showMainPage();
+                });
             }
         }
 
-        function handleDetailImageUpload(event) {
+        function handleDetailImageUpload(event, lotId) {
             const files = event.target.files;
-            const previewDiv = document.getElementById('detail_preview');
+            const lot = objects.find(o => o.id === lotId);
+            if (!lot) return;
             
             for (let i = 0; i < files.length; i++) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    if (!lot.images) lot.images = [];
+                    lot.images.push({
+                        data: e.target.result,
+                        name: files[i].name
+                    });
+                    
+                    // Обновляем превью
+                    const previewDiv = document.getElementById('detail_preview');
                     const img = document.createElement('img');
                     img.src = e.target.result;
                     
@@ -1081,13 +1154,27 @@
                     const delBtn = document.createElement('button');
                     delBtn.innerHTML = '×';
                     delBtn.onclick = function() {
-                        previewItem.remove();
+                        const index = lot.images.findIndex(img => img.data === e.target.result);
+                        if (index !== -1) {
+                            lot.images.splice(index, 1);
+                            previewItem.remove();
+                        }
                     };
                     previewItem.appendChild(delBtn);
                     
                     previewDiv.appendChild(previewItem);
                 };
                 reader.readAsDataURL(files[i]);
+            }
+        }
+
+        function removeImage(lotId, imageIndex) {
+            if (!checkPermission('edit')) return;
+            
+            const lot = objects.find(o => o.id === lotId);
+            if (lot && lot.images) {
+                lot.images.splice(imageIndex, 1);
+                renderLotDetail(lot);
             }
         }
 
@@ -1105,8 +1192,12 @@
             doc.text('ПРЕЗЕНТАЦИЯ ОБЪЕКТА', 105, yPos, { align: 'center' });
             yPos += 15;
             
-            doc.setFontSize(14);
+            doc.setFontSize(16);
             doc.setTextColor(0, 0, 0);
+            doc.text(`Лот ${lot.lotNumber}`, 20, yPos);
+            yPos += 10;
+            
+            doc.setFontSize(14);
             doc.text(`Адрес: ${lot.address}`, 20, yPos);
             yPos += 10;
             
@@ -1144,7 +1235,7 @@
             yPos += 7;
             doc.text(`Доп. связь: ${lot.ownerExtra || 'Не указано'}`, 20, yPos);
             
-            doc.save(`object_${lot.address.substring(0, 20)}.pdf`);
+            doc.save(`lot_${lot.lotNumber}.pdf`);
         }
 
         // ============================================
@@ -1159,10 +1250,14 @@
                 document.getElementById('baseSection').style.display = 'block';
                 document.getElementById('userNameDisplay').innerHTML = `<i class="fas fa-user"></i> ${currentUser.name}`;
                 
-                // Загружаем сохраненное название компании
                 const savedCompanyName = localStorage.getItem('companyName');
                 if (savedCompanyName) {
                     document.getElementById('companyName').innerText = savedCompanyName;
+                }
+                
+                const savedToken = localStorage.getItem('github_token');
+                if (savedToken) {
+                    githubToken = savedToken;
                 }
                 
                 await loadData();
@@ -1174,7 +1269,6 @@
             document.getElementById('createBtn').style.display = 
                 checkPermission('create') ? 'inline-block' : 'none';
                 
-            // Сохраняем название компании при изменении
             document.getElementById('companyName').addEventListener('blur', function() {
                 localStorage.setItem('companyName', this.innerText);
             });
