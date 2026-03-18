@@ -12,16 +12,98 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Roboto, sans-serif; }
-        body { background: #0b1120; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        body { background: #0b1120; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .container { max-width: 1600px; width: 100%; }
-        h1 { color: #fff; font-weight: 500; margin-bottom: 25px; }
-        h1 span { color: #3b82f6; font-weight: 700; background: rgba(59,130,246,0.1); padding: 5px 15px; border-radius: 40px; font-size: 1.2rem; }
         
-        /* Карточки */
+        /* Стили для формы входа */
+        .login-container {
+            max-width: 400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        .login-card {
+            background: #1e293b;
+            border-radius: 24px;
+            padding: 40px;
+            border: 1px solid #334155;
+            text-align: center;
+        }
+        
+        .login-card h2 {
+            color: #fff;
+            margin-bottom: 30px;
+        }
+        
+        .login-card h2 i {
+            color: #3b82f6;
+            margin-right: 10px;
+        }
+        
+        .login-card .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .login-card .form-group label {
+            display: block;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .login-card .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .login-card .form-group input:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+        
+        .login-card .btn {
+            width: 100%;
+            padding: 14px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .login-card .btn:hover {
+            background: #2563eb;
+        }
+        
+        .login-card .error {
+            color: #ef4444;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .login-card .info {
+            color: #94a3b8;
+            margin-top: 20px;
+            font-size: 0.85rem;
+        }
+        
+        .login-card .info a {
+            color: #3b82f6;
+            text-decoration: none;
+        }
+        
+        /* Основные стили (те же, что и раньше) */
         .card { background: #1e293b; border-radius: 24px; padding: 28px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); margin-bottom: 25px; border: 1px solid #334155; }
         .card h3 { color: #f1f5f9; margin-top: 0; margin-bottom: 25px; font-weight: 500; display: flex; align-items: center; gap: 10px; }
-        
-        /* Сетка формы */
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px; }
         .form-group { display: flex; flex-direction: column; }
         .form-group label { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px; }
@@ -29,7 +111,6 @@
         .form-group input:focus, .form-group select:focus { border-color: #3b82f6; outline: none; background: #1a2538; }
         .form-group textarea { resize: vertical; min-height: 70px; background: #0f172a; color: #f1f5f9; }
         
-        /* Кнопки */
         .btn { background: #3b82f6; color: white; border: none; padding: 14px 35px; border-radius: 40px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
         .btn:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 20px 30px -10px #3b82f6; }
         .btn-outline { background: transparent; color: #f1f5f9; border: 1px solid #3b82f6; }
@@ -37,7 +118,6 @@
         .btn-warning { background: #f59e0b; color: black; }
         .btn-warning:hover { background: #d97706; }
         
-        /* Загрузка изображений */
         .image-upload-area { border: 2px dashed #334155; border-radius: 16px; padding: 20px; text-align: center; background: #0f172a; cursor: pointer; transition: 0.2s; }
         .image-upload-area:hover { border-color: #3b82f6; background: #1a2538; }
         .image-preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
@@ -46,24 +126,20 @@
         .image-preview-item button { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .image-preview-item button:hover { background: red; }
         
-        /* Контакты собственника */
         .owner-contacts { background: #0f172a; border-radius: 16px; padding: 20px; margin-top: 20px; border: 1px solid #334155; }
         .owner-contacts h4 { color: #f1f5f9; margin-top: 0; margin-bottom: 15px; font-size: 1rem; }
         
-        /* Поиск */
         .search-section { background: #1e293b; border-radius: 60px; padding: 8px; display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 25px; border: 1px solid #334155; }
         .search-section input { flex: 1; min-width: 280px; padding: 15px 25px; border: none; border-radius: 60px; font-size: 1rem; background: #0f172a; color: white; }
         .search-section input::placeholder { color: #64748b; }
         .search-section select { padding: 15px 25px; border: none; border-radius: 60px; background: #0f172a; color: white; cursor: pointer; font-weight: 500; border: 1px solid #334155; }
         
-        /* Таблица */
         .table-wrapper { overflow-x: auto; border-radius: 24px; background: #1e293b; box-shadow: 0 25px 50px -12px black; border: 1px solid #334155; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; color: #e2e8f0; }
         th { background: #0f172a; color: #94a3b8; font-weight: 700; padding: 18px 12px; text-align: left; border-bottom: 2px solid #334155; white-space: nowrap; }
         td { padding: 16px 12px; border-bottom: 1px solid #334155; vertical-align: middle; }
         tr:hover { background: #263445; }
         
-        /* Бейджи */
         .badge { display: inline-block; padding: 4px 14px; border-radius: 40px; font-size: 0.75rem; font-weight: 700; }
         .badge.sale { background: #1e3a5f; color: #90caf9; }
         .badge.rent { background: #1e3a3a; color: #81c784; }
@@ -71,7 +147,6 @@
         .badge.class-b { background: #3a2e1e; color: #ffa726; }
         .badge.class-c { background: #3a2a1e; color: #ff9800; }
         
-        /* Действия */
         .actions { display: flex; gap: 8px; flex-wrap: wrap; }
         .action-btn { background: #334155; border: none; color: #f1f5f9; width: 36px; height: 36px; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; transition: 0.2s; }
         .action-btn:hover { background: #3b82f6; transform: scale(1.1); }
@@ -83,33 +158,27 @@
         
         .empty-state { text-align: center; padding: 60px; color: #64748b; }
         
-        /* Статистика */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-card { background: #1e293b; border-radius: 20px; padding: 20px; border-left: 6px solid #3b82f6; border: 1px solid #334155; }
         .stat-card span { display: block; font-size: 2rem; font-weight: 700; color: #f1f5f9; }
         .stat-card p { margin: 5px 0 0; color: #94a3b8; font-weight: 500; }
         
-        /* Индикатор редактирования */
         .editing-indicator { background: #f59e0b; color: black; padding: 5px 15px; border-radius: 40px; font-size: 0.9rem; font-weight: 600; margin-left: 15px; }
         
-        /* Миниатюры в таблице */
         .thumb-grid { display: flex; gap: 3px; flex-wrap: wrap; max-width: 100px; }
         .thumb-img { width: 30px; height: 30px; border-radius: 6px; object-fit: cover; border: 1px solid #334155; }
 
         /* Информация о пользователе */
         .user-info {
-            position: fixed;
-            top: 20px;
-            right: 20px;
             background: #1e293b;
             padding: 10px 20px;
             border-radius: 40px;
             border: 1px solid #3b82f6;
             color: white;
-            z-index: 1000;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 15px;
+            margin-bottom: 20px;
         }
         .user-info button {
             background: #ef4444;
@@ -122,723 +191,790 @@
         .user-info button:hover {
             background: #dc2626;
         }
+        .user-info a {
+            color: #3b82f6;
+            text-decoration: none;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
-    <!-- Информация о пользователе -->
-    <div class="user-info" id="userInfo" style="display: none;">
-        <span id="userNameDisplay"></span>
-        <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+    <div class="container" id="app">
+        <!-- Форма входа (показывается, если не авторизован) -->
+        <div id="loginSection" class="login-container">
+            <div class="login-card">
+                <h2><i class="fas fa-warehouse"></i> База недвижимости</h2>
+                <p style="color: #94a3b8; margin-bottom: 25px;">Войдите в систему для доступа к базе</p>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Логин</label>
+                    <input type="text" id="loginUsername" placeholder="Введите логин">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Пароль</label>
+                    <input type="password" id="loginPassword" placeholder="Введите пароль">
+                </div>
+                
+                <button class="btn" onclick="login()"><i class="fas fa-sign-in-alt"></i> Войти</button>
+                
+                <div id="loginError" class="error"></div>
+                
+                <div class="info">
+                    <i class="fas fa-shield-alt"></i> Для входа используйте логин и пароль, созданные в админке<br>
+                    <a href="/admin/" target="_blank"><i class="fas fa-cog"></i> Перейти в админку</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Основная база (показывается после входа) -->
+        <div id="baseSection" style="display: none;">
+            <!-- Информация о пользователе -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h1>🏭 <span>ПРОФЕССИОНАЛЬНАЯ БАЗА</span> Склады · Цеха · Участки</h1>
+                <div class="user-info" id="userInfo">
+                    <span id="userNameDisplay"></span>
+                    <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Выйти</button>
+                    <a href="/admin/" target="_blank" title="Управление пользователями"><i class="fas fa-cog"></i></a>
+                </div>
+            </div>
+
+            <!-- Форма добавления -->
+            <div class="card">
+                <h3>
+                    <span style="background: #3b82f6; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px;"><i class="fas fa-plus"></i></span> 
+                    НОВЫЙ ОБЪЕКТ
+                    <span id="editingMode" class="editing-indicator" style="display: none;"><i class="fas fa-edit"></i> РЕДАКТИРОВАНИЕ</span>
+                </h3>
+                
+                <div class="form-grid">
+                    <!-- Основное -->
+                    <div class="form-group"><label>Адрес/название*</label><input type="text" id="address" placeholder="Промзона, ул. Заводская 10"></div>
+                    <div class="form-group"><label>Тип сделки</label>
+                        <select id="dealType"><option value="Продажа">Продажа</option><option value="Аренда">Аренда</option></select>
+                    </div>
+                    <div class="form-group"><label>Категория</label>
+                        <select id="category">
+                            <option value="Склад">Склад</option>
+                            <option value="Производственный цех">Производственный цех</option>
+                            <option value="Земельный участок">Земельный участок</option>
+                            <option value="Ангар">Ангар</option>
+                        </select>
+                    </div>
+                    
+                    <!-- КЛАСС СКЛАДА -->
+                    <div class="form-group"><label>Класс склада</label>
+                        <select id="warehouseClass">
+                            <option value="A">A (высший)</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                            <option value="D">D</option>
+                            <option value="Не применимо">Не применимо</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Технические характеристики -->
+                    <div class="form-group"><label>Высота потолков (м)</label><input type="text" id="height" placeholder="10.5"></div>
+                    <div class="form-group"><label>Нагрузка на пол (кг/м²)</label><input type="text" id="floorLoad" placeholder="5000"></div>
+                    <div class="form-group"><label>Тип покрытия пола</label>
+                        <select id="floorType">
+                            <option value="Бетон">Бетон</option>
+                            <option value="Полимерный">Полимерный</option>
+                            <option value="Асфальт">Асфальт</option>
+                            <option value="Грунт">Грунт</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Площадь и цена -->
+                    <div class="form-group"><label>Площадь (м²)</label><input type="text" id="area" placeholder="1500"></div>
+                    <div class="form-group"><label>Цена/ставка (₽)</label><input type="text" id="price" placeholder="45 000 000"></div>
+                    <div class="form-group"><label>Электричество (кВт)</label><input type="text" id="power" placeholder="250"></div>
+                    
+                    <!-- Ворота -->
+                    <div class="form-group"><label>Тип ворот</label><input type="text" id="gates" placeholder="Доковые"></div>
+                    <div class="form-group"><label>Высота ворот (м)</label><input type="text" id="gateHeight" placeholder="5.0"></div>
+                    
+                    <!-- Ж/Д, отопление, год, охрана -->
+                    <div class="form-group"><label>Ж/д ветка</label>
+                        <select id="railway"><option value="Нет">Нет</option><option value="Есть (тупик)">Есть (тупик)</option><option value="Есть (сквозная)">Есть (сквозная)</option></select>
+                    </div>
+                    <div class="form-group"><label>Отопление</label>
+                        <select id="heating"><option value="Есть">Есть</option><option value="Нет">Нет</option><option value="Своя котельная">Своя котельная</option><option value="Газовое">Газовое</option></select>
+                    </div>
+                    <div class="form-group"><label>Год постройки</label><input type="text" id="yearBuilt" placeholder="2018"></div>
+                    <div class="form-group"><label>Охрана</label>
+                        <select id="security"><option value="Есть">Есть</option><option value="Нет">Нет</option><option value="Круглосуточная">Круглосуточная</option></select>
+                    </div>
+                </div>
+
+                <!-- КОНТАКТЫ СОБСТВЕННИКА -->
+                <div class="owner-contacts">
+                    <h4><i class="fas fa-user"></i> КОНТАКТЫ СОБСТВЕННИКА (конфиденциально)</h4>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Имя собственника</label><input type="text" id="ownerName" placeholder="Иван Петров"></div>
+                        <div class="form-group"><label>Телефон</label><input type="text" id="ownerPhone" placeholder="+7 (999) 123-45-67"></div>
+                        <div class="form-group"><label>Email</label><input type="email" id="ownerEmail" placeholder="ivan@example.com"></div>
+                        <div class="form-group"><label>Доп. связь</label><input type="text" id="ownerExtra" placeholder="Telegram, WhatsApp"></div>
+                    </div>
+                </div>
+
+                <!-- ЗАГРУЗКА ИЗОБРАЖЕНИЙ -->
+                <div style="margin-top: 20px;">
+                    <h4><i class="fas fa-images"></i> ФОТОГРАФИИ ОБЪЕКТА</h4>
+                    <div class="image-upload-area" onclick="document.getElementById('fileInput').click()">
+                        <input type="file" id="fileInput" accept="image/*" multiple style="display: none;" onchange="handleImageUpload(event)">
+                        <p style="color: #94a3b8; margin: 0;"><i class="fas fa-cloud-upload-alt"></i> Нажмите для загрузки фото (можно несколько)</p>
+                        <p style="color: #64748b; font-size: 0.8rem; margin-top: 5px;">Поддерживаются JPG, PNG</p>
+                    </div>
+                    <div id="imagePreviewContainer" class="image-preview-grid"></div>
+                </div>
+
+                <!-- Комментарий -->
+                <div style="margin-top: 20px;">
+                    <div class="form-group"><label><i class="fas fa-comment"></i> КОММЕНТАРИЙ</label>
+                        <textarea id="comment" placeholder="Дополнительная информация о объекте..."></textarea>
+                    </div>
+                </div>
+                
+                <!-- Кнопки действий -->
+                <div style="display: flex; gap: 15px; margin-top: 30px; flex-wrap: wrap;">
+                    <button class="btn" onclick="saveObject()" id="saveBtn"><i class="fas fa-save"></i> СОХРАНИТЬ ОБЪЕКТ</button>
+                    <button class="btn btn-outline" onclick="clearForm()"><i class="fas fa-eraser"></i> Очистить форму</button>
+                    <button class="btn btn-warning" onclick="loadFromGitHub()"><i class="fas fa-sync"></i> Обновить данные с GitHub</button>
+                </div>
+            </div>
+
+            <!-- Поиск и фильтры -->
+            <div class="search-section">
+                <input type="text" id="searchInput" placeholder="🔍 Поиск: адрес, комментарий, собственник..." onkeyup="renderTable()">
+                <select id="filterType" onchange="renderTable()"><option value="all">Все сделки</option><option value="Продажа">Продажа</option><option value="Аренда">Аренда</option></select>
+                <select id="filterCategory" onchange="renderTable()"><option value="all">Все категории</option><option value="Склад">Склад</option><option value="Производственный цех">Цех</option><option value="Земельный участок">Участок</option></select>
+                <select id="filterClass" onchange="renderTable()"><option value="all">Все классы</option><option value="A">Класс A</option><option value="B">Класс B</option><option value="C">Класс C</option></select>
+            </div>
+
+            <!-- Статистика -->
+            <div class="stats-grid">
+                <div class="stat-card"><span id="totalCount">0</span><p>Всего объектов</p></div>
+                <div class="stat-card"><span id="totalArea">0</span><p>Общая пл. (м²)</p></div>
+                <div class="stat-card"><span id="avgHeight">0</span><p>Ср. высота (м)</p></div>
+                <div class="stat-card"><span id="avgPower">0</span><p>Ср. мощность (кВт)</p></div>
+            </div>
+
+            <!-- ТАБЛИЦА ОБЪЕКТОВ -->
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Фото</th>
+                            <th>Адрес</th>
+                            <th>Тип/Класс</th>
+                            <th>Категория</th>
+                            <th>Характеристики</th>
+                            <th>Площадь/Цена</th>
+                            <th>Контакты</th>
+                            <th>Комментарий</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr><td colspan="9" class="empty-state"><i class="fas fa-spinner fa-spin"></i> Загрузка данных с GitHub...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
-<div class="container">
-    <h1>🏭 <span>ПРОФЕССИОНАЛЬНАЯ БАЗА</span> Склады · Цеха · Участки</h1>
-
-    <!-- Форма добавления -->
-    <div class="card">
-        <h3>
-            <span style="background: #3b82f6; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px;"><i class="fas fa-plus"></i></span> 
-            НОВЫЙ ОБЪЕКТ
-            <span id="editingMode" class="editing-indicator" style="display: none;"><i class="fas fa-edit"></i> РЕДАКТИРОВАНИЕ</span>
-        </h3>
+    <script>
+        // ============================================
+        // КОНФИГУРАЦИЯ
+        // ============================================
+        const GITHUB_OWNER = 'xsibx';
+        const GITHUB_REPO = 'xsibx.github.io';
+        const GITHUB_USERS_PATH = 'data/users.json';
+        const GITHUB_DATA_PATH = 'data.json';
         
-        <div class="form-grid">
-            <!-- Основное -->
-            <div class="form-group"><label>Адрес/название*</label><input type="text" id="address" placeholder="Промзона, ул. Заводская 10"></div>
-            <div class="form-group"><label>Тип сделки</label>
-                <select id="dealType"><option value="Продажа">Продажа</option><option value="Аренда">Аренда</option></select>
-            </div>
-            <div class="form-group"><label>Категория</label>
-                <select id="category">
-                    <option value="Склад">Склад</option>
-                    <option value="Производственный цех">Производственный цех</option>
-                    <option value="Земельный участок">Земельный участок</option>
-                    <option value="Ангар">Ангар</option>
-                </select>
-            </div>
-            
-            <!-- КЛАСС СКЛАДА -->
-            <div class="form-group"><label>Класс склада</label>
-                <select id="warehouseClass">
-                    <option value="A">A (высший)</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
-                    <option value="Не применимо">Не применимо</option>
-                </select>
-            </div>
-            
-            <!-- Технические характеристики -->
-            <div class="form-group"><label>Высота потолков (м)</label><input type="text" id="height" placeholder="10.5"></div>
-            <div class="form-group"><label>Нагрузка на пол (кг/м²)</label><input type="text" id="floorLoad" placeholder="5000"></div>
-            <div class="form-group"><label>Тип покрытия пола</label>
-                <select id="floorType">
-                    <option value="Бетон">Бетон</option>
-                    <option value="Полимерный">Полимерный</option>
-                    <option value="Асфальт">Асфальт</option>
-                    <option value="Грунт">Грунт</option>
-                </select>
-            </div>
-            
-            <!-- Площадь и цена -->
-            <div class="form-group"><label>Площадь (м²)</label><input type="text" id="area" placeholder="1500"></div>
-            <div class="form-group"><label>Цена/ставка (₽)</label><input type="text" id="price" placeholder="45 000 000"></div>
-            <div class="form-group"><label>Электричество (кВт)</label><input type="text" id="power" placeholder="250"></div>
-            
-            <!-- Ворота -->
-            <div class="form-group"><label>Тип ворот</label><input type="text" id="gates" placeholder="Доковые"></div>
-            <div class="form-group"><label>Высота ворот (м)</label><input type="text" id="gateHeight" placeholder="5.0"></div>
-            
-            <!-- Ж/Д, отопление, год, охрана -->
-            <div class="form-group"><label>Ж/д ветка</label>
-                <select id="railway"><option value="Нет">Нет</option><option value="Есть (тупик)">Есть (тупик)</option><option value="Есть (сквозная)">Есть (сквозная)</option></select>
-            </div>
-            <div class="form-group"><label>Отопление</label>
-                <select id="heating"><option value="Есть">Есть</option><option value="Нет">Нет</option><option value="Своя котельная">Своя котельная</option><option value="Газовое">Газовое</option></select>
-            </div>
-            <div class="form-group"><label>Год постройки</label><input type="text" id="yearBuilt" placeholder="2018"></div>
-            <div class="form-group"><label>Охрана</label>
-                <select id="security"><option value="Есть">Есть</option><option value="Нет">Нет</option><option value="Круглосуточная">Круглосуточная</option></select>
-            </div>
-        </div>
+        let objects = [];
+        let editingId = null;
+        let currentImages = [];
+        let githubToken = localStorage.getItem('github_token') || '';
+        let currentUser = null;
 
-        <!-- КОНТАКТЫ СОБСТВЕННИКА -->
-        <div class="owner-contacts">
-            <h4><i class="fas fa-user"></i> КОНТАКТЫ СОБСТВЕННИКА (конфиденциально)</h4>
-            <div class="form-grid">
-                <div class="form-group"><label>Имя собственника</label><input type="text" id="ownerName" placeholder="Иван Петров"></div>
-                <div class="form-group"><label>Телефон</label><input type="text" id="ownerPhone" placeholder="+7 (999) 123-45-67"></div>
-                <div class="form-group"><label>Email</label><input type="email" id="ownerEmail" placeholder="ivan@example.com"></div>
-                <div class="form-group"><label>Доп. связь</label><input type="text" id="ownerExtra" placeholder="Telegram, WhatsApp"></div>
-            </div>
-        </div>
-
-        <!-- ЗАГРУЗКА ИЗОБРАЖЕНИЙ -->
-        <div style="margin-top: 20px;">
-            <h4><i class="fas fa-images"></i> ФОТОГРАФИИ ОБЪЕКТА</h4>
-            <div class="image-upload-area" onclick="document.getElementById('fileInput').click()">
-                <input type="file" id="fileInput" accept="image/*" multiple style="display: none;" onchange="handleImageUpload(event)">
-                <p style="color: #94a3b8; margin: 0;"><i class="fas fa-cloud-upload-alt"></i> Нажмите для загрузки фото (можно несколько)</p>
-                <p style="color: #64748b; font-size: 0.8rem; margin-top: 5px;">Поддерживаются JPG, PNG</p>
-            </div>
-            <div id="imagePreviewContainer" class="image-preview-grid"></div>
-        </div>
-
-        <!-- Комментарий -->
-        <div style="margin-top: 20px;">
-            <div class="form-group"><label><i class="fas fa-comment"></i> КОММЕНТАРИЙ</label>
-                <textarea id="comment" placeholder="Дополнительная информация о объекте..."></textarea>
-            </div>
-        </div>
+        // ============================================
+        // АВТОРИЗАЦИЯ
+        // ============================================
         
-        <!-- Кнопки действий -->
-        <div style="display: flex; gap: 15px; margin-top: 30px; flex-wrap: wrap;">
-            <button class="btn" onclick="saveObject()" id="saveBtn"><i class="fas fa-save"></i> СОХРАНИТЬ ОБЪЕКТ</button>
-            <button class="btn btn-outline" onclick="clearForm()"><i class="fas fa-eraser"></i> Очистить форму</button>
-            <button class="btn btn-warning" onclick="loadFromGitHub()"><i class="fas fa-sync"></i> Обновить данные с GitHub</button>
-        </div>
-    </div>
-
-    <!-- Поиск и фильтры -->
-    <div class="search-section">
-        <input type="text" id="searchInput" placeholder="🔍 Поиск: адрес, комментарий, собственник..." onkeyup="renderTable()">
-        <select id="filterType" onchange="renderTable()"><option value="all">Все сделки</option><option value="Продажа">Продажа</option><option value="Аренда">Аренда</option></select>
-        <select id="filterCategory" onchange="renderTable()"><option value="all">Все категории</option><option value="Склад">Склад</option><option value="Производственный цех">Цех</option><option value="Земельный участок">Участок</option></select>
-        <select id="filterClass" onchange="renderTable()"><option value="all">Все классы</option><option value="A">Класс A</option><option value="B">Класс B</option><option value="C">Класс C</option></select>
-    </div>
-
-    <!-- Статистика -->
-    <div class="stats-grid">
-        <div class="stat-card"><span id="totalCount">0</span><p>Всего объектов</p></div>
-        <div class="stat-card"><span id="totalArea">0</span><p>Общая пл. (м²)</p></div>
-        <div class="stat-card"><span id="avgHeight">0</span><p>Ср. высота (м)</p></div>
-        <div class="stat-card"><span id="avgPower">0</span><p>Ср. мощность (кВт)</p></div>
-    </div>
-
-    <!-- ТАБЛИЦА ОБЪЕКТОВ -->
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>Фото</th>
-                    <th>Адрес</th>
-                    <th>Тип/Класс</th>
-                    <th>Категория</th>
-                    <th>Характеристики</th>
-                    <th>Площадь/Цена</th>
-                    <th>Контакты</th>
-                    <th>Комментарий</th>
-                    <th>Действия</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <tr><td colspan="9" class="empty-state"><i class="fas fa-spinner fa-spin"></i> Загрузка данных с GitHub...</td></tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<script>
-    // ============================================
-    // СИСТЕМА АВТОРИЗАЦИИ
-    // ============================================
-    
-    // Глобальная переменная для текущего пользователя
-    window.currentUser = null;
-    
-    // Загружаем пользователя из localStorage
-    function loadCurrentUser() {
-        try {
-            const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
-                window.currentUser = JSON.parse(savedUser);
-                document.getElementById('userInfo').style.display = 'flex';
-                document.getElementById('userNameDisplay').innerHTML = `<i class="fas fa-user"></i> ${window.currentUser.name} (${window.currentUser.role})`;
-                return true;
-            } else {
-                // Если нет пользователя - перенаправляем на админку
-                window.location.href = '/admin/';
-                return false;
+        // Загрузка пользователей с GitHub
+        async function loadUsers() {
+            try {
+                const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_USERS_PATH}`;
+                const response = await fetch(url);
+                
+                if (response.status === 404) {
+                    return null;
+                }
+                
+                const data = await response.json();
+                const content = atob(data.content.replace(/\n/g, ''));
+                return JSON.parse(content);
+            } catch (error) {
+                console.error('Ошибка загрузки пользователей:', error);
+                return null;
             }
-        } catch (e) {
-            console.error('Ошибка загрузки пользователя:', e);
-            window.location.href = '/admin/';
-            return false;
         }
-    }
-    
-    // Проверка прав
-    function checkPermission(action) {
-        if (!window.currentUser) {
-            alert('Необходимо авторизоваться');
-            window.location.href = '/admin/';
-            return false;
-        }
-        
-        switch(action) {
-            case 'create':
-                if (!window.currentUser.canCreate) {
-                    alert('У вас нет прав на создание объектов');
-                    return false;
-                }
-                break;
-            case 'edit':
-                if (!window.currentUser.canEdit) {
-                    alert('У вас нет прав на редактирование');
-                    return false;
-                }
-                break;
-            case 'delete':
-                if (!window.currentUser.canDelete) {
-                    alert('У вас нет прав на удаление');
-                    return false;
-                }
-                break;
-        }
-        return true;
-    }
-    
-    // Выход
-    function logout() {
-        localStorage.removeItem('currentUser');
-        window.location.href = '/admin/';
-    }
-    
-    // Загружаем пользователя при старте
-    loadCurrentUser();
-    
-    // ============================================
-    // КОНФИГУРАЦИЯ GITHUB
-    // ============================================
-    
-    const GITHUB_OWNER = 'xsibx';
-    const GITHUB_REPO = 'xsibx.github.io';
-    const GITHUB_PATH = 'data.json';
-    
-    let objects = [];
-    let editingId = null;
-    let currentImages = [];
-    let githubToken = localStorage.getItem('github_token') || '';
 
-    // ============================================
-    // РАБОТА С GITHUB
-    // ============================================
-    
-    // Загрузка с GitHub
-    async function loadFromGitHub() {
-        try {
-            document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fas fa-spinner fa-spin"></i> Загрузка данных с GitHub...</td></tr>';
+        // Вход в систему
+        async function login() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
             
-            const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`;
-            const response = await fetch(url);
-            
-            if (response.status === 404) {
-                objects = [];
-                saveToLocalStorage();
-                renderTable();
+            if (!username || !password) {
+                document.getElementById('loginError').innerHTML = '❌ Введите логин и пароль';
                 return;
             }
             
-            const data = await response.json();
+            const users = await loadUsers();
             
-            // Декодирование base64 с поддержкой Unicode
-            const base64Content = data.content.replace(/\n/g, '');
-            const binaryString = atob(base64Content);
-            const bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            const jsonString = new TextDecoder('utf-8').decode(bytes);
-            objects = JSON.parse(jsonString);
-            
-            objects.forEach(obj => {
-                if (obj.images) {
-                    obj.images = obj.images.map(img => ({
-                        data: img.data,
-                        name: img.name
-                    }));
-                }
-            });
-            
-            saveToLocalStorage();
-            renderTable();
-        } catch (error) {
-            console.error('Ошибка загрузки с GitHub:', error);
-            loadFromLocalStorage();
-        }
-    }
-
-    // Сохранение на GitHub
-    async function saveToGitHub() {
-        if (!githubToken) {
-            alert('Сначала введите GitHub токен в разделе настроек');
-            return false;
-        }
-
-        try {
-            const objectsToSave = objects.map(obj => ({
-                ...obj,
-                images: obj.images || []
-            }));
-
-            // Кодирование с поддержкой Unicode
-            const jsonString = JSON.stringify(objectsToSave, null, 2);
-            const encoder = new TextEncoder();
-            const data = encoder.encode(jsonString);
-            const binaryString = String.fromCharCode.apply(null, data);
-            const content = btoa(binaryString);
-            
-            const getUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`;
-            const getResponse = await fetch(getUrl);
-            
-            let sha = null;
-            if (getResponse.status !== 404) {
-                const existingData = await getResponse.json();
-                sha = existingData.sha;
-            }
-
-            const putUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`;
-            const putResponse = await fetch(putUrl, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${githubToken}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    message: 'Обновление базы объектов',
-                    content: content,
-                    sha: sha
-                })
-            });
-
-            if (putResponse.ok) {
-                alert('✅ Данные успешно сохранены на GitHub!');
-                return true;
+            if (users && users[username] && users[username].password === password) {
+                currentUser = {
+                    username: username,
+                    ...users[username]
+                };
+                
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // Показываем основную базу
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('baseSection').style.display = 'block';
+                document.getElementById('userNameDisplay').innerHTML = `<i class="fas fa-user"></i> ${currentUser.name} (${currentUser.role})`;
+                
+                // Загружаем данные
+                loadFromGitHub();
             } else {
-                const error = await putResponse.json();
-                alert('❌ Ошибка сохранения: ' + error.message);
+                document.getElementById('loginError').innerHTML = '❌ Неверный логин или пароль';
+            }
+        }
+
+        // Выход
+        function logout() {
+            localStorage.removeItem('currentUser');
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('baseSection').style.display = 'none';
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginError').innerHTML = '';
+        }
+
+        // Проверка прав
+        function checkPermission(action) {
+            if (!currentUser) return false;
+            
+            switch(action) {
+                case 'create': return currentUser.canCreate;
+                case 'edit': return currentUser.canEdit;
+                case 'delete': return currentUser.canDelete;
+                default: return false;
+            }
+        }
+
+        // Проверка авторизации при загрузке
+        (async function() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('baseSection').style.display = 'block';
+                document.getElementById('userNameDisplay').innerHTML = `<i class="fas fa-user"></i> ${currentUser.name} (${currentUser.role})`;
+                loadFromGitHub();
+            } else {
+                document.getElementById('loginSection').style.display = 'block';
+                document.getElementById('baseSection').style.display = 'none';
+            }
+        })();
+
+        // ============================================
+        // РАБОТА С GITHUB (ДАННЫЕ)
+        // ============================================
+        
+        // Загрузка с GitHub
+        async function loadFromGitHub() {
+            try {
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fas fa-spinner fa-spin"></i> Загрузка данных с GitHub...</td></tr>';
+                
+                const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_DATA_PATH}`;
+                const response = await fetch(url);
+                
+                if (response.status === 404) {
+                    objects = [];
+                    saveToLocalStorage();
+                    renderTable();
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                // Декодирование base64 с поддержкой Unicode
+                const base64Content = data.content.replace(/\n/g, '');
+                const binaryString = atob(base64Content);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                const jsonString = new TextDecoder('utf-8').decode(bytes);
+                objects = JSON.parse(jsonString);
+                
+                objects.forEach(obj => {
+                    if (obj.images) {
+                        obj.images = obj.images.map(img => ({
+                            data: img.data,
+                            name: img.name
+                        }));
+                    }
+                });
+                
+                saveToLocalStorage();
+                renderTable();
+            } catch (error) {
+                console.error('Ошибка загрузки с GitHub:', error);
+                loadFromLocalStorage();
+            }
+        }
+
+        // Сохранение на GitHub
+        async function saveToGitHub() {
+            if (!githubToken) {
+                alert('Сначала введите GitHub токен в разделе настроек админки');
                 return false;
             }
-        } catch (error) {
-            console.error('Ошибка сохранения на GitHub:', error);
-            alert('❌ Ошибка соединения с GitHub');
-            return false;
-        }
-    }
 
-    // ============================================
-    // ЛОКАЛЬНОЕ ХРАНИЛИЩЕ
-    // ============================================
-    
-    function loadFromLocalStorage() {
-        const stored = localStorage.getItem('objects');
-        if (stored) {
             try {
-                objects = JSON.parse(stored);
-            } catch (e) {
-                objects = [];
-            }
-        } else {
-            objects = [];
-        }
-        renderTable();
-    }
+                const objectsToSave = objects.map(obj => ({
+                    ...obj,
+                    images: obj.images || []
+                }));
 
-    function saveToLocalStorage() {
-        localStorage.setItem('objects', JSON.stringify(objects));
-    }
-
-    // ============================================
-    // РАБОТА С ФОРМОЙ
-    // ============================================
-    
-    function clearForm() {
-        document.getElementById('address').value = '';
-        document.getElementById('dealType').value = 'Продажа';
-        document.getElementById('category').value = 'Склад';
-        document.getElementById('warehouseClass').value = 'A';
-        document.getElementById('height').value = '';
-        document.getElementById('floorLoad').value = '';
-        document.getElementById('floorType').value = 'Бетон';
-        document.getElementById('area').value = '';
-        document.getElementById('price').value = '';
-        document.getElementById('power').value = '';
-        document.getElementById('gates').value = '';
-        document.getElementById('gateHeight').value = '';
-        document.getElementById('railway').value = 'Нет';
-        document.getElementById('heating').value = 'Есть';
-        document.getElementById('yearBuilt').value = '';
-        document.getElementById('security').value = 'Нет';
-        document.getElementById('comment').value = '';
-        
-        document.getElementById('ownerName').value = '';
-        document.getElementById('ownerPhone').value = '';
-        document.getElementById('ownerEmail').value = '';
-        document.getElementById('ownerExtra').value = '';
-        
-        currentImages = [];
-        updateImagePreview();
-        
-        editingId = null;
-        document.getElementById('editingMode').style.display = 'none';
-        document.getElementById('saveBtn').innerHTML = '<i class="fas fa-save"></i> СОХРАНИТЬ ОБЪЕКТ';
-    }
-
-    function handleImageUpload(event) {
-        const files = event.target.files;
-        for (let i = 0; i < files.length; i++) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                currentImages.push({
-                    data: e.target.result,
-                    name: files[i].name
-                });
-                updateImagePreview();
-            };
-            reader.readAsDataURL(files[i]);
-        }
-    }
-
-    function updateImagePreview() {
-        const container = document.getElementById('imagePreviewContainer');
-        let html = '';
-        currentImages.forEach((img, index) => {
-            html += `
-                <div class="image-preview-item">
-                    <img src="${img.data}" alt="preview">
-                    <button onclick="removeImage(${index})"><i class="fas fa-times"></i></button>
-                </div>
-            `;
-        });
-        container.innerHTML = html;
-    }
-
-    function removeImage(index) {
-        currentImages.splice(index, 1);
-        updateImagePreview();
-    }
-
-    // ============================================
-    // ОСНОВНЫЕ ОПЕРАЦИИ С ОБЪЕКТАМИ
-    // ============================================
-    
-    async function saveObject() {
-        // Проверка прав
-        if (editingId) {
-            if (!checkPermission('edit')) return;
-        } else {
-            if (!checkPermission('create')) return;
-        }
-        
-        const address = document.getElementById('address').value.trim();
-        if (!address) {
-            alert('Введите адрес или название объекта');
-            return;
-        }
-
-        const newObj = {
-            id: editingId || Date.now(),
-            address: address,
-            dealType: document.getElementById('dealType').value,
-            category: document.getElementById('category').value,
-            warehouseClass: document.getElementById('warehouseClass').value,
-            height: document.getElementById('height').value || '—',
-            floorLoad: document.getElementById('floorLoad').value || '—',
-            floorType: document.getElementById('floorType').value,
-            area: document.getElementById('area').value || '—',
-            price: document.getElementById('price').value || '—',
-            power: document.getElementById('power').value || '—',
-            gates: document.getElementById('gates').value || '—',
-            gateHeight: document.getElementById('gateHeight').value || '—',
-            railway: document.getElementById('railway').value,
-            heating: document.getElementById('heating').value,
-            yearBuilt: document.getElementById('yearBuilt').value || '—',
-            security: document.getElementById('security').value,
-            ownerName: document.getElementById('ownerName').value || '—',
-            ownerPhone: document.getElementById('ownerPhone').value || '—',
-            ownerEmail: document.getElementById('ownerEmail').value || '—',
-            ownerExtra: document.getElementById('ownerExtra').value || '—',
-            images: currentImages,
-            comment: document.getElementById('comment').value || '—'
-        };
-
-        if (editingId) {
-            objects = objects.map(obj => obj.id === editingId ? newObj : obj);
-        } else {
-            objects.push(newObj);
-        }
-
-        saveToLocalStorage();
-        
-        const saved = await saveToGitHub();
-        if (saved) {
-            clearForm();
-        }
-    }
-
-    async function deleteObject(id) {
-        if (!checkPermission('delete')) return;
-        
-        if (confirm('Удалить объект?')) {
-            objects = objects.filter(obj => obj.id !== id);
-            saveToLocalStorage();
-            await saveToGitHub();
-            renderTable();
-            if (editingId === id) clearForm();
-        }
-    }
-
-    function editObject(id) {
-        if (!checkPermission('edit')) return;
-        
-        const obj = objects.find(o => o.id === id);
-        if (!obj) return;
-
-        document.getElementById('address').value = obj.address;
-        document.getElementById('dealType').value = obj.dealType;
-        document.getElementById('category').value = obj.category;
-        document.getElementById('warehouseClass').value = obj.warehouseClass;
-        document.getElementById('height').value = obj.height !== '—' ? obj.height : '';
-        document.getElementById('floorLoad').value = obj.floorLoad !== '—' ? obj.floorLoad : '';
-        document.getElementById('floorType').value = obj.floorType;
-        document.getElementById('area').value = obj.area !== '—' ? obj.area : '';
-        document.getElementById('price').value = obj.price !== '—' ? obj.price : '';
-        document.getElementById('power').value = obj.power !== '—' ? obj.power : '';
-        document.getElementById('gates').value = obj.gates !== '—' ? obj.gates : '';
-        document.getElementById('gateHeight').value = obj.gateHeight !== '—' ? obj.gateHeight : '';
-        document.getElementById('railway').value = obj.railway;
-        document.getElementById('heating').value = obj.heating;
-        document.getElementById('yearBuilt').value = obj.yearBuilt !== '—' ? obj.yearBuilt : '';
-        document.getElementById('security').value = obj.security;
-        document.getElementById('comment').value = obj.comment !== '—' ? obj.comment : '';
-        
-        document.getElementById('ownerName').value = obj.ownerName !== '—' ? obj.ownerName : '';
-        document.getElementById('ownerPhone').value = obj.ownerPhone !== '—' ? obj.ownerPhone : '';
-        document.getElementById('ownerEmail').value = obj.ownerEmail !== '—' ? obj.ownerEmail : '';
-        document.getElementById('ownerExtra').value = obj.ownerExtra !== '—' ? obj.ownerExtra : '';
-        
-        currentImages = obj.images || [];
-        updateImagePreview();
-
-        editingId = id;
-        document.getElementById('editingMode').style.display = 'inline-block';
-        document.getElementById('saveBtn').innerHTML = '<i class="fas fa-edit"></i> ОБНОВИТЬ ОБЪЕКТ';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // ============================================
-    // ГЕНЕРАЦИЯ PDF
-    // ============================================
-    
-    async function generatePDF(id) {
-        const obj = objects.find(o => o.id === id);
-        if (!obj) return;
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        
-        let yPos = 20;
-        
-        doc.setFontSize(20);
-        doc.setTextColor(59, 130, 246);
-        doc.text('ПРЕЗЕНТАЦИЯ ОБЪЕКТА', 105, yPos, { align: 'center' });
-        yPos += 15;
-        
-        doc.setFontSize(14);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`Адрес: ${obj.address}`, 20, yPos);
-        yPos += 10;
-        
-        doc.setFontSize(12);
-        doc.text(`Тип сделки: ${obj.dealType}`, 20, yPos);
-        doc.text(`Категория: ${obj.category}`, 120, yPos);
-        yPos += 8;
-        
-        doc.text(`Класс: ${obj.warehouseClass}`, 20, yPos);
-        doc.text(`Площадь: ${obj.area} м²`, 120, yPos);
-        yPos += 8;
-        
-        doc.text(`Высота потолков: ${obj.height} м`, 20, yPos);
-        doc.text(`Нагрузка на пол: ${obj.floorLoad} кг/м²`, 120, yPos);
-        yPos += 8;
-        
-        doc.text(`Покрытие пола: ${obj.floorType}`, 20, yPos);
-        doc.text(`Электричество: ${obj.power} кВт`, 120, yPos);
-        yPos += 8;
-        
-        doc.text(`Ворота: ${obj.gates} / высота ${obj.gateHeight} м`, 20, yPos);
-        yPos += 8;
-        
-        doc.text(`Ж/д ветка: ${obj.railway}`, 20, yPos);
-        doc.text(`Отопление: ${obj.heating}`, 120, yPos);
-        yPos += 8;
-        
-        doc.text(`Год постройки: ${obj.yearBuilt}`, 20, yPos);
-        doc.text(`Охрана: ${obj.security}`, 120, yPos);
-        yPos += 15;
-        
-        doc.setFontSize(16);
-        doc.setTextColor(34, 197, 94);
-        const priceFormatted = obj.price !== '—' ? parseFloat(obj.price).toLocaleString('ru-RU') : '—';
-        doc.text(`Цена: ${priceFormatted} ₽`, 20, yPos);
-        yPos += 15;
-        
-        doc.setFontSize(12);
-        doc.text('Описание:', 20, yPos);
-        yPos += 6;
-        
-        const commentLines = doc.splitTextToSize(obj.comment, 170);
-        doc.text(commentLines, 20, yPos);
-        yPos += (commentLines.length * 6) + 10;
-        
-        if (obj.ownerName !== '—') {
-            doc.setFontSize(14);
-            doc.text('Контакты собственника:', 20, yPos);
-            yPos += 8;
-            doc.setFontSize(11);
-            doc.text(`Имя: ${obj.ownerName}`, 20, yPos);
-            yPos += 6;
-            doc.text(`Телефон: ${obj.ownerPhone}`, 20, yPos);
-            yPos += 6;
-            if (obj.ownerEmail !== '—') doc.text(`Email: ${obj.ownerEmail}`, 20, yPos);
-        }
-        
-        doc.save(`object_${obj.address.substring(0, 20)}.pdf`);
-    }
-
-    // ============================================
-    // ОТОБРАЖЕНИЕ ТАБЛИЦЫ
-    // ============================================
-    
-    function renderTable() {
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        const filterType = document.getElementById('filterType').value;
-        const filterCategory = document.getElementById('filterCategory').value;
-        const filterClass = document.getElementById('filterClass').value;
-
-        let filtered = objects.filter(obj => {
-            const matchesSearch = obj.address.toLowerCase().includes(searchTerm) ||
-                                 obj.comment.toLowerCase().includes(searchTerm) ||
-                                 (obj.ownerName && obj.ownerName.toLowerCase().includes(searchTerm)) ||
-                                 (obj.ownerPhone && obj.ownerPhone.includes(searchTerm));
-            const matchesType = filterType === 'all' || obj.dealType === filterType;
-            const matchesCategory = filterCategory === 'all' || obj.category === filterCategory;
-            const matchesClass = filterClass === 'all' || obj.warehouseClass === filterClass;
-            return matchesSearch && matchesType && matchesCategory && matchesClass;
-        });
-
-        document.getElementById('totalCount').innerText = filtered.length;
-        const totalArea = filtered.reduce((acc, o) => acc + (parseFloat(o.area) || 0), 0);
-        document.getElementById('totalArea').innerText = Math.round(totalArea).toLocaleString('ru-RU');
-        
-        const heights = filtered.map(o => parseFloat(o.height)).filter(h => !isNaN(h) && h > 0);
-        const avgHeight = heights.length ? (heights.reduce((a,b) => a+b, 0) / heights.length).toFixed(1) : 0;
-        document.getElementById('avgHeight').innerText = avgHeight;
-        
-        const powers = filtered.map(o => parseFloat(o.power)).filter(p => !isNaN(p) && p > 0);
-        const avgPower = powers.length ? Math.round(powers.reduce((a,b) => a+b, 0) / powers.length) : 0;
-        document.getElementById('avgPower').innerText = avgPower;
-
-        let html = '';
-        if (filtered.length === 0) {
-            html = '<tr><td colspan="9" class="empty-state"><i class="fas fa-warehouse"></i> Объекты не найдены</td></tr>';
-        } else {
-            filtered.forEach(obj => {
-                let thumbs = '';
-                if (obj.images && obj.images.length > 0) {
-                    thumbs = '<div class="thumb-grid">';
-                    obj.images.slice(0, 3).forEach(img => {
-                        thumbs += `<img src="${img.data}" class="thumb-img" alt="фото">`;
-                    });
-                    if (obj.images.length > 3) thumbs += '<span>...</span>';
-                    thumbs += '</div>';
-                } else {
-                    thumbs = '<i class="fas fa-image" style="color: #4b5563;"></i>';
+                // Кодирование с поддержкой Unicode
+                const jsonString = JSON.stringify(objectsToSave, null, 2);
+                const encoder = new TextEncoder();
+                const data = encoder.encode(jsonString);
+                const binaryString = String.fromCharCode.apply(null, data);
+                const content = btoa(binaryString);
+                
+                const getUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_DATA_PATH}`;
+                const getResponse = await fetch(getUrl);
+                
+                let sha = null;
+                if (getResponse.status !== 404) {
+                    const existingData = await getResponse.json();
+                    sha = existingData.sha;
                 }
 
-                const typeClass = obj.dealType === 'Продажа' ? 'sale' : 'rent';
-                const classBadge = obj.warehouseClass === 'A' ? 'class-a' : (obj.warehouseClass === 'B' ? 'class-b' : (obj.warehouseClass === 'C' ? 'class-c' : ''));
-                
-                const priceFormatted = obj.price !== '—' ? parseFloat(obj.price).toLocaleString('ru-RU') : '—';
-                const specs = `В:${obj.height}м Н:${obj.floorLoad}кг Э:${obj.power}кВт`;
-                const contacts = obj.ownerName !== '—' ? `${obj.ownerName} ${obj.ownerPhone}` : '—';
-                
-                // Проверка прав для кнопок
-                const canEdit = window.currentUser && window.currentUser.canEdit;
-                const canDelete = window.currentUser && window.currentUser.canDelete;
-                
-                html += `<tr>
-                    <td>${thumbs}</td>
-                    <td><strong>${obj.address}</strong></td>
-                    <td><span class="badge ${typeClass}">${obj.dealType}</span> ${obj.warehouseClass !== 'Не применимо' ? `<span class="badge ${classBadge}">${obj.warehouseClass}</span>` : ''}</td>
-                    <td>${obj.category}</td>
-                    <td>${specs}</td>
-                    <td>${obj.area} м²<br>${priceFormatted} ₽</td>
-                    <td>${contacts}</td>
-                    <td>${obj.comment.substring(0, 30)}${obj.comment.length > 30 ? '...' : ''}</td>
-                    <td class="actions">
-                        ${canEdit ? 
-                            `<button class="action-btn edit" onclick="editObject(${obj.id})" title="Редактировать"><i class="fas fa-edit"></i></button>` : 
-                            `<button class="action-btn" disabled title="Нет прав"><i class="fas fa-edit"></i></button>`
-                        }
-                        ${canDelete ? 
-                            `<button class="action-btn delete" onclick="deleteObject(${obj.id})" title="Удалить"><i class="fas fa-trash"></i></button>` : 
-                            `<button class="action-btn" disabled title="Нет прав"><i class="fas fa-trash"></i></button>`
-                        }
-                        <button class="pdf-btn" onclick="generatePDF(${obj.id})" title="Скачать PDF"><i class="fas fa-file-pdf"></i> PDF</button>
-                    </td>
-                </tr>`;
-            });
-        }
-        document.getElementById('tableBody').innerHTML = html;
-    }
+                const putUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_DATA_PATH}`;
+                const putResponse = await fetch(putUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${githubToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Обновление базы объектов',
+                        content: content,
+                        sha: sha
+                    })
+                });
 
-    // ============================================
-    // ИНИЦИАЛИЗАЦИЯ
-    // ============================================
-    
-    // Загружаем данные при старте
-    loadFromGitHub();
-</script>
+                if (putResponse.ok) {
+                    alert('✅ Данные успешно сохранены на GitHub!');
+                    return true;
+                } else {
+                    const error = await putResponse.json();
+                    alert('❌ Ошибка сохранения: ' + error.message);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Ошибка сохранения на GitHub:', error);
+                alert('❌ Ошибка соединения с GitHub');
+                return false;
+            }
+        }
+
+        // ============================================
+        // ЛОКАЛЬНОЕ ХРАНИЛИЩЕ
+        // ============================================
+        
+        function loadFromLocalStorage() {
+            const stored = localStorage.getItem('objects');
+            if (stored) {
+                try {
+                    objects = JSON.parse(stored);
+                } catch (e) {
+                    objects = [];
+                }
+            } else {
+                objects = [];
+            }
+            renderTable();
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('objects', JSON.stringify(objects));
+        }
+
+        // ============================================
+        // РАБОТА С ФОРМОЙ
+        // ============================================
+        
+        function clearForm() {
+            document.getElementById('address').value = '';
+            document.getElementById('dealType').value = 'Продажа';
+            document.getElementById('category').value = 'Склад';
+            document.getElementById('warehouseClass').value = 'A';
+            document.getElementById('height').value = '';
+            document.getElementById('floorLoad').value = '';
+            document.getElementById('floorType').value = 'Бетон';
+            document.getElementById('area').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('power').value = '';
+            document.getElementById('gates').value = '';
+            document.getElementById('gateHeight').value = '';
+            document.getElementById('railway').value = 'Нет';
+            document.getElementById('heating').value = 'Есть';
+            document.getElementById('yearBuilt').value = '';
+            document.getElementById('security').value = 'Нет';
+            document.getElementById('comment').value = '';
+            
+            document.getElementById('ownerName').value = '';
+            document.getElementById('ownerPhone').value = '';
+            document.getElementById('ownerEmail').value = '';
+            document.getElementById('ownerExtra').value = '';
+            
+            currentImages = [];
+            updateImagePreview();
+            
+            editingId = null;
+            document.getElementById('editingMode').style.display = 'none';
+            document.getElementById('saveBtn').innerHTML = '<i class="fas fa-save"></i> СОХРАНИТЬ ОБЪЕКТ';
+        }
+
+        function handleImageUpload(event) {
+            const files = event.target.files;
+            for (let i = 0; i < files.length; i++) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImages.push({
+                        data: e.target.result,
+                        name: files[i].name
+                    });
+                    updateImagePreview();
+                };
+                reader.readAsDataURL(files[i]);
+            }
+        }
+
+        function updateImagePreview() {
+            const container = document.getElementById('imagePreviewContainer');
+            let html = '';
+            currentImages.forEach((img, index) => {
+                html += `
+                    <div class="image-preview-item">
+                        <img src="${img.data}" alt="preview">
+                        <button onclick="removeImage(${index})"><i class="fas fa-times"></i></button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function removeImage(index) {
+            currentImages.splice(index, 1);
+            updateImagePreview();
+        }
+
+        // ============================================
+        // ОСНОВНЫЕ ОПЕРАЦИИ С ОБЪЕКТАМИ
+        // ============================================
+        
+        async function saveObject() {
+            // Проверка прав
+            if (editingId) {
+                if (!checkPermission('edit')) {
+                    alert('У вас нет прав на редактирование');
+                    return;
+                }
+            } else {
+                if (!checkPermission('create')) {
+                    alert('У вас нет прав на создание объектов');
+                    return;
+                }
+            }
+            
+            const address = document.getElementById('address').value.trim();
+            if (!address) {
+                alert('Введите адрес или название объекта');
+                return;
+            }
+
+            const newObj = {
+                id: editingId || Date.now(),
+                address: address,
+                dealType: document.getElementById('dealType').value,
+                category: document.getElementById('category').value,
+                warehouseClass: document.getElementById('warehouseClass').value,
+                height: document.getElementById('height').value || '—',
+                floorLoad: document.getElementById('floorLoad').value || '—',
+                floorType: document.getElementById('floorType').value,
+                area: document.getElementById('area').value || '—',
+                price: document.getElementById('price').value || '—',
+                power: document.getElementById('power').value || '—',
+                gates: document.getElementById('gates').value || '—',
+                gateHeight: document.getElementById('gateHeight').value || '—',
+                railway: document.getElementById('railway').value,
+                heating: document.getElementById('heating').value,
+                yearBuilt: document.getElementById('yearBuilt').value || '—',
+                security: document.getElementById('security').value,
+                ownerName: document.getElementById('ownerName').value || '—',
+                ownerPhone: document.getElementById('ownerPhone').value || '—',
+                ownerEmail: document.getElementById('ownerEmail').value || '—',
+                ownerExtra: document.getElementById('ownerExtra').value || '—',
+                images: currentImages,
+                comment: document.getElementById('comment').value || '—'
+            };
+
+            if (editingId) {
+                objects = objects.map(obj => obj.id === editingId ? newObj : obj);
+            } else {
+                objects.push(newObj);
+            }
+
+            saveToLocalStorage();
+            
+            const saved = await saveToGitHub();
+            if (saved) {
+                clearForm();
+            }
+        }
+
+        async function deleteObject(id) {
+            if (!checkPermission('delete')) {
+                alert('У вас нет прав на удаление');
+                return;
+            }
+            
+            if (confirm('Удалить объект?')) {
+                objects = objects.filter(obj => obj.id !== id);
+                saveToLocalStorage();
+                await saveToGitHub();
+                renderTable();
+                if (editingId === id) clearForm();
+            }
+        }
+
+        function editObject(id) {
+            if (!checkPermission('edit')) {
+                alert('У вас нет прав на редактирование');
+                return;
+            }
+            
+            const obj = objects.find(o => o.id === id);
+            if (!obj) return;
+
+            document.getElementById('address').value = obj.address;
+            document.getElementById('dealType').value = obj.dealType;
+            document.getElementById('category').value = obj.category;
+            document.getElementById('warehouseClass').value = obj.warehouseClass;
+            document.getElementById('height').value = obj.height !== '—' ? obj.height : '';
+            document.getElementById('floorLoad').value = obj.floorLoad !== '—' ? obj.floorLoad : '';
+            document.getElementById('floorType').value = obj.floorType;
+            document.getElementById('area').value = obj.area !== '—' ? obj.area : '';
+            document.getElementById('price').value = obj.price !== '—' ? obj.price : '';
+            document.getElementById('power').value = obj.power !== '—' ? obj.power : '';
+            document.getElementById('gates').value = obj.gates !== '—' ? obj.gates : '';
+            document.getElementById('gateHeight').value = obj.gateHeight !== '—' ? obj.gateHeight : '';
+            document.getElementById('railway').value = obj.railway;
+            document.getElementById('heating').value = obj.heating;
+            document.getElementById('yearBuilt').value = obj.yearBuilt !== '—' ? obj.yearBuilt : '';
+            document.getElementById('security').value = obj.security;
+            document.getElementById('comment').value = obj.comment !== '—' ? obj.comment : '';
+            
+            document.getElementById('ownerName').value = obj.ownerName !== '—' ? obj.ownerName : '';
+            document.getElementById('ownerPhone').value = obj.ownerPhone !== '—' ? obj.ownerPhone : '';
+            document.getElementById('ownerEmail').value = obj.ownerEmail !== '—' ? obj.ownerEmail : '';
+            document.getElementById('ownerExtra').value = obj.ownerExtra !== '—' ? obj.ownerExtra : '';
+            
+            currentImages = obj.images || [];
+            updateImagePreview();
+
+            editingId = id;
+            document.getElementById('editingMode').style.display = 'inline-block';
+            document.getElementById('saveBtn').innerHTML = '<i class="fas fa-edit"></i> ОБНОВИТЬ ОБЪЕКТ';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ============================================
+        // ГЕНЕРАЦИЯ PDF
+        // ============================================
+        
+        async function generatePDF(id) {
+            const obj = objects.find(o => o.id === id);
+            if (!obj) return;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            let yPos = 20;
+            
+            doc.setFontSize(20);
+            doc.setTextColor(59, 130, 246);
+            doc.text('ПРЕЗЕНТАЦИЯ ОБЪЕКТА', 105, yPos, { align: 'center' });
+            yPos += 15;
+            
+            doc.setFontSize(14);
+            doc.setTextColor(0, 0, 0);
+            doc.text(`Адрес: ${obj.address}`, 20, yPos);
+            yPos += 10;
+            
+            doc.setFontSize(12);
+            doc.text(`Тип сделки: ${obj.dealType}`, 20, yPos);
+            doc.text(`Категория: ${obj.category}`, 120, yPos);
+            yPos += 8;
+            
+            doc.text(`Класс: ${obj.warehouseClass}`, 20, yPos);
+            doc.text(`Площадь: ${obj.area} м²`, 120, yPos);
+            yPos += 8;
+            
+            doc.text(`Высота потолков: ${obj.height} м`, 20, yPos);
+            doc.text(`Нагрузка на пол: ${obj.floorLoad} кг/м²`, 120, yPos);
+            yPos += 8;
+            
+            doc.text(`Покрытие пола: ${obj.floorType}`, 20, yPos);
+            doc.text(`Электричество: ${obj.power} кВт`, 120, yPos);
+            yPos += 8;
+            
+            doc.text(`Ворота: ${obj.gates} / высота ${obj.gateHeight} м`, 20, yPos);
+            yPos += 8;
+            
+            doc.text(`Ж/д ветка: ${obj.railway}`, 20, yPos);
+            doc.text(`Отопление: ${obj.heating}`, 120, yPos);
+            yPos += 8;
+            
+            doc.text(`Год постройки: ${obj.yearBuilt}`, 20, yPos);
+            doc.text(`Охрана: ${obj.security}`, 120, yPos);
+            yPos += 15;
+            
+            doc.setFontSize(16);
+            doc.setTextColor(34, 197, 94);
+            const priceFormatted = obj.price !== '—' ? parseFloat(obj.price).toLocaleString('ru-RU') : '—';
+            doc.text(`Цена: ${priceFormatted} ₽`, 20, yPos);
+            yPos += 15;
+            
+            doc.setFontSize(12);
+            doc.text('Описание:', 20, yPos);
+            yPos += 6;
+            
+            const commentLines = doc.splitTextToSize(obj.comment, 170);
+            doc.text(commentLines, 20, yPos);
+            yPos += (commentLines.length * 6) + 10;
+            
+            if (obj.ownerName !== '—') {
+                doc.setFontSize(14);
+                doc.text('Контакты собственника:', 20, yPos);
+                yPos += 8;
+                doc.setFontSize(11);
+                doc.text(`Имя: ${obj.ownerName}`, 20, yPos);
+                yPos += 6;
+                doc.text(`Телефон: ${obj.ownerPhone}`, 20, yPos);
+                yPos += 6;
+                if (obj.ownerEmail !== '—') doc.text(`Email: ${obj.ownerEmail}`, 20, yPos);
+            }
+            
+            doc.save(`object_${obj.address.substring(0, 20)}.pdf`);
+        }
+
+        // ============================================
+        // ОТОБРАЖЕНИЕ ТАБЛИЦЫ
+        // ============================================
+        
+        function renderTable() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filterType = document.getElementById('filterType').value;
+            const filterCategory = document.getElementById('filterCategory').value;
+            const filterClass = document.getElementById('filterClass').value;
+
+            let filtered = objects.filter(obj => {
+                const matchesSearch = obj.address.toLowerCase().includes(searchTerm) ||
+                                     obj.comment.toLowerCase().includes(searchTerm) ||
+                                     (obj.ownerName && obj.ownerName.toLowerCase().includes(searchTerm)) ||
+                                     (obj.ownerPhone && obj.ownerPhone.includes(searchTerm));
+                const matchesType = filterType === 'all' || obj.dealType === filterType;
+                const matchesCategory = filterCategory === 'all' || obj.category === filterCategory;
+                const matchesClass = filterClass === 'all' || obj.warehouseClass === filterClass;
+                return matchesSearch && matchesType && matchesCategory && matchesClass;
+            });
+
+            document.getElementById('totalCount').innerText = filtered.length;
+            const totalArea = filtered.reduce((acc, o) => acc + (parseFloat(o.area) || 0), 0);
+            document.getElementById('totalArea').innerText = Math.round(totalArea).toLocaleString('ru-RU');
+            
+            const heights = filtered.map(o => parseFloat(o.height)).filter(h => !isNaN(h) && h > 0);
+            const avgHeight = heights.length ? (heights.reduce((a,b) => a+b, 0) / heights.length).toFixed(1) : 0;
+            document.getElementById('avgHeight').innerText = avgHeight;
+            
+            const powers = filtered.map(o => parseFloat(o.power)).filter(p => !isNaN(p) && p > 0);
+            const avgPower = powers.length ? Math.round(powers.reduce((a,b) => a+b, 0) / powers.length) : 0;
+            document.getElementById('avgPower').innerText = avgPower;
+
+            let html = '';
+            if (filtered.length === 0) {
+                html = '<tr><td colspan="9" class="empty-state"><i class="fas fa-warehouse"></i> Объекты не найдены</td></tr>';
+            } else {
+                filtered.forEach(obj => {
+                    let thumbs = '';
+                    if (obj.images && obj.images.length > 0) {
+                        thumbs = '<div class="thumb-grid">';
+                        obj.images.slice(0, 3).forEach(img => {
+                            thumbs += `<img src="${img.data}" class="thumb-img" alt="фото">`;
+                        });
+                        if (obj.images.length > 3) thumbs += '<span>...</span>';
+                        thumbs += '</div>';
+                    } else {
+                        thumbs = '<i class="fas fa-image" style="color: #4b5563;"></i>';
+                    }
+
+                    const typeClass = obj.dealType === 'Продажа' ? 'sale' : 'rent';
+                    const classBadge = obj.warehouseClass === 'A' ? 'class-a' : (obj.warehouseClass === 'B' ? 'class-b' : (obj.warehouseClass === 'C' ? 'class-c' : ''));
+                    
+                    const priceFormatted = obj.price !== '—' ? parseFloat(obj.price).toLocaleString('ru-RU') : '—';
+                    const specs = `В:${obj.height}м Н:${obj.floorLoad}кг Э:${obj.power}кВт`;
+                    const contacts = obj.ownerName !== '—' ? `${obj.ownerName} ${obj.ownerPhone}` : '—';
+                    
+                    // Проверка прав для кнопок
+                    const canEdit = checkPermission('edit');
+                    const canDelete = checkPermission('delete');
+                    
+                    html += `<tr>
+                        <td>${thumbs}</td>
+                        <td><strong>${obj.address}</strong></td>
+                        <td><span class="badge ${typeClass}">${obj.dealType}</span> ${obj.warehouseClass !== 'Не применимо' ? `<span class="badge ${classBadge}">${obj.warehouseClass}</span>` : ''}</td>
+                        <td>${obj.category}</td>
+                        <td>${specs}</td>
+                        <td>${obj.area} м²<br>${priceFormatted} ₽</td>
+                        <td>${contacts}</td>
+                        <td>${obj.comment.substring(0, 30)}${obj.comment.length > 30 ? '...' : ''}</td>
+                        <td class="actions">
+                            ${canEdit ? 
+                                `<button class="action-btn edit" onclick="editObject(${obj.id})" title="Редактировать"><i class="fas fa-edit"></i></button>` : 
+                                `<button class="action-btn" disabled title="Нет прав"><i class="fas fa-edit"></i></button>`
+                            }
+                            ${canDelete ? 
+                                `<button class="action-btn delete" onclick="deleteObject(${obj.id})" title="Удалить"><i class="fas fa-trash"></i></button>` : 
+                                `<button class="action-btn" disabled title="Нет прав"><i class="fas fa-trash"></i></button>`
+                            }
+                            <button class="pdf-btn" onclick="generatePDF(${obj.id})" title="Скачать PDF"><i class="fas fa-file-pdf"></i> PDF</button>
+                        </td>
+                    </tr>`;
+                });
+            }
+            document.getElementById('tableBody').innerHTML = html;
+        }
+    </script>
 </body>
 </html>
