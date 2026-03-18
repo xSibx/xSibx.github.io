@@ -1,1 +1,27 @@
-[]
+[
+  {
+    "id": 1773840381062,
+    "address": "тестовый Склад",
+    "dealType": "Продажа",
+    "category": "Склад",
+    "warehouseClass": "A",
+    "height": "—",
+    "floorLoad": "—",
+    "floorType": "Бетон",
+    "area": "—",
+    "price": "—",
+    "power": "—",
+    "gates": "—",
+    "gateHeight": "—",
+    "railway": "Нет",
+    "heating": "Есть",
+    "yearBuilt": "—",
+    "security": "Есть",
+    "ownerName": "—",
+    "ownerPhone": "—",
+    "ownerEmail": "—",
+    "ownerExtra": "—",
+    "images": [],
+    "comment": "—"
+  }
+]
