@@ -275,7 +275,7 @@
     let currentImages = [];
     let githubToken = localStorage.getItem('github_token') || '';
 
-    // Загрузка данных с GitHub
+    // Загрузка с GitHub (исправленная версия)
     async function loadFromGitHub() {
         try {
             document.getElementById('tableBody').innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fas fa-spinner fa-spin"></i> Загрузка данных с GitHub...</td></tr>';
@@ -284,7 +284,6 @@
             const response = await fetch(url);
             
             if (response.status === 404) {
-                // Файл не существует, создаём пустой массив
                 objects = [];
                 saveToLocalStorage();
                 renderTable();
@@ -292,10 +291,13 @@
             }
             
             const data = await response.json();
-            const content = atob(data.content.replace(/\n/g, ''));
-            objects = JSON.parse(content);
             
-            // Конвертируем изображения обратно в формат для отображения
+            // Правильное декодирование base64 в Unicode
+            const base64Content = data.content.replace(/\n/g, '');
+            const utf8Bytes = atob(base64Content);
+            const jsonString = decodeURIComponent(escape(utf8Bytes));
+            objects = JSON.parse(jsonString);
+            
             objects.forEach(obj => {
                 if (obj.images) {
                     obj.images = obj.images.map(img => ({
@@ -309,12 +311,11 @@
             renderTable();
         } catch (error) {
             console.error('Ошибка загрузки с GitHub:', error);
-            // Если не удалось загрузить, пробуем взять из localStorage
             loadFromLocalStorage();
         }
     }
 
-    // Сохранение на GitHub
+    // Сохранение на GitHub (исправленная версия)
     async function saveToGitHub() {
         if (!githubToken) {
             alert('Сначала введите GitHub токен в разделе настроек');
@@ -325,10 +326,13 @@
             // Подготавливаем объекты для сохранения
             const objectsToSave = objects.map(obj => ({
                 ...obj,
-                images: obj.images || [] // images уже в правильном формате
+                images: obj.images || []
             }));
 
-            const content = btoa(unescape(encodeURIComponent(JSON.stringify(objectsToSave, null, 2))));
+            // Правильное кодирование Unicode в base64
+            const jsonString = JSON.stringify(objectsToSave, null, 2);
+            const utf8Bytes = unescape(encodeURIComponent(jsonString));
+            const content = btoa(utf8Bytes);
             
             // Получаем текущий файл чтобы узнать его SHA
             const getUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_PATH}`;
