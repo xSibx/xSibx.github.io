@@ -57,13 +57,11 @@
             margin-left: 5px;
         }
         
-        /* Карта на всю ширину */
+        /* Карта на полэкрана */
         #map-container {
             width: 100%;
-            height: 350px;
+            height: 50vh;
             position: relative;
-            transition: height 0.3s ease;
-            overflow: hidden;
             border-bottom: 2px solid #334155;
         }
         
@@ -72,36 +70,61 @@
             height: 100%;
         }
         
-        /* Кнопка для сворачивания/разворачивания карты */
-        .map-toggle {
-            position: absolute;
-            bottom: 15px;
-            right: 20px;
-            z-index: 1000;
+        /* Фильтры между картой и поиском */
+        .filters-bar {
             background: #1e293b;
-            color: white;
-            border: 1px solid #3b82f6;
-            padding: 10px 20px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-size: 0.9rem;
+            padding: 15px 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .filter-group {
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            background: #0f172a;
+            padding: 5px 15px;
+            border-radius: 40px;
+            border: 1px solid #334155;
         }
         
-        .map-toggle:hover {
-            background: #2d3a4a;
+        .filter-group label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
         }
         
-        /* Стили для закрытой карты */
-        #map-container.collapsed {
-            height: 60px;
+        .filter-group select {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 8px 5px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            outline: none;
         }
         
-        #map-container.collapsed #map {
-            display: none;
+        .filter-group select option {
+            background: #1e293b;
+        }
+        
+        .price-range {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .price-range input {
+            width: 100px;
+            padding: 8px 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 40px;
+            color: white;
         }
         
         /* Основной контент */
@@ -109,39 +132,27 @@
             padding: 20px;
         }
         
-        /* Поиск и фильтры */
+        /* Поиск по адресу */
         .search-section {
             background: #1e293b;
             border-radius: 60px;
             padding: 6px;
             display: flex;
             gap: 10px;
-            flex-wrap: wrap;
             margin-bottom: 20px;
             border: 1px solid #334155;
         }
         .search-section input {
             flex: 1;
-            min-width: 250px;
             padding: 12px 20px;
             border: none;
             border-radius: 60px;
             font-size: 0.95rem;
             background: #0f172a;
             color: white;
-        }
-        .search-section select {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 60px;
-            background: #0f172a;
-            color: white;
-            cursor: pointer;
-            border: 1px solid #334155;
-            font-size: 0.95rem;
         }
         
-        /* Список объектов (простой список) */
+        /* Список объектов */
         .objects-list {
             background: #1e293b;
             border-radius: 16px;
@@ -366,6 +377,20 @@
         }
         
         .error { color: #ef4444; margin-top: 10px; }
+        
+        /* Стили для детальной страницы лота */
+        .lot-detail-page {
+            background: #1e293b;
+            border-radius: 24px;
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        .back-button {
+            margin-bottom: 20px;
+            display: inline-block;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -397,45 +422,87 @@
                 </div>
             </div>
 
-            <!-- Карта на всю ширину с кнопкой сворачивания -->
-            <div id="map-container" class="collapsed">
+            <!-- Карта на полэкрана -->
+            <div id="map-container">
                 <div id="map"></div>
-                <div class="map-toggle" onclick="toggleMap()">
-                    <i class="fas fa-map"></i>
-                    <span id="mapToggleText">Показать карту</span>
-                </div>
             </div>
 
-            <!-- Основной контент -->
-            <div class="content">
-                <!-- Поиск и фильтры -->
-                <div class="search-section">
-                    <input type="text" id="searchInput" placeholder="🔍 Поиск по адресу, описанию..." onkeyup="filterLots()">
+            <!-- Фильтры между картой и поиском -->
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label>Тип сделки</label>
                     <select id="filterType" onchange="filterLots()">
-                        <option value="all">Все сделки</option>
+                        <option value="all">Все</option>
                         <option value="Продажа">Продажа</option>
                         <option value="Аренда">Аренда</option>
                     </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Категория</label>
                     <select id="filterCategory" onchange="filterLots()">
-                        <option value="all">Все категории</option>
+                        <option value="all">Все</option>
                         <option value="Склад">Склад</option>
                         <option value="Производственный цех">Цех</option>
                         <option value="Земельный участок">Участок</option>
                         <option value="Ангар">Ангар</option>
                     </select>
-                    <select id="filterClass" onchange="filterLots()">
-                        <option value="all">Все классы</option>
-                        <option value="A">Класс A</option>
-                        <option value="B">Класс B</option>
-                        <option value="C">Класс C</option>
-                    </select>
-                    <button class="btn" onclick="createNewLot()" id="createBtn" style="margin-left: auto;">
-                        <i class="fas fa-plus"></i> Новый объект
-                    </button>
                 </div>
+                
+                <div class="filter-group">
+                    <label>Класс</label>
+                    <select id="filterClass" onchange="filterLots()">
+                        <option value="all">Все</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Мин. цена</label>
+                    <input type="number" id="minPrice" placeholder="от" onchange="filterLots()" style="width: 100px;">
+                </div>
+                
+                <div class="filter-group">
+                    <label>Макс. цена</label>
+                    <input type="number" id="maxPrice" placeholder="до" onchange="filterLots()" style="width: 100px;">
+                </div>
+                
+                <div class="filter-group">
+                    <label>Мин. площадь</label>
+                    <input type="number" id="minArea" placeholder="от" onchange="filterLots()" style="width: 100px;">
+                </div>
+                
+                <button class="btn" onclick="resetFilters()" style="margin-left: auto;">
+                    <i class="fas fa-undo"></i> Сброс
+                </button>
+            </div>
 
-                <!-- Список объектов (простой список) -->
-                <div class="objects-list" id="objectsList"></div>
+            <!-- Основной контент (главная страница со списком) -->
+            <div id="mainContent">
+                <!-- Поиск по адресу -->
+                <div class="content">
+                    <div class="search-section">
+                        <input type="text" id="searchInput" placeholder="🔍 Поиск по адресу, описанию..." onkeyup="filterLots()">
+                        <button class="btn" onclick="createNewLot()" id="createBtn">
+                            <i class="fas fa-plus"></i> Новый объект
+                        </button>
+                    </div>
+
+                    <!-- Список объектов -->
+                    <div class="objects-list" id="objectsList"></div>
+                </div>
+            </div>
+
+            <!-- Детальная страница лота (скрыта по умолчанию) -->
+            <div id="lotDetailPage" style="display: none;">
+                <div class="content">
+                    <div class="back-button" onclick="showMainPage()">
+                        <i class="fas fa-arrow-left"></i> Назад к списку
+                    </div>
+                    <div id="lotDetailContent" class="lot-detail-page"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -446,12 +513,11 @@
         // ============================================
         const GITHUB_OWNER = 'xsibx';
         const GITHUB_REPO = 'xsibx.github.io';
-        const GITHUB_DATA_PATH = 'data.json';
         let objects = [];
         let currentUser = null;
         let map = null;
         let placemarks = [];
-        let expandedLotId = null;
+        let currentLotId = null;
 
         // ============================================
         // ТЕСТОВЫЕ ДАННЫЕ (10 лотов)
@@ -723,27 +789,6 @@
         // ФУНКЦИИ ДЛЯ КАРТЫ
         // ============================================
         
-        function toggleMap() {
-            const container = document.getElementById('map-container');
-            const text = document.getElementById('mapToggleText');
-            
-            if (container.classList.contains('collapsed')) {
-                container.classList.remove('collapsed');
-                text.innerHTML = 'Скрыть карту';
-                // Перерисовываем карту при открытии
-                if (map) {
-                    setTimeout(() => {
-                        map.container.fitToViewport();
-                    }, 300);
-                } else {
-                    initMap();
-                }
-            } else {
-                container.classList.add('collapsed');
-                text.innerHTML = 'Показать карту';
-            }
-        }
-        
         function initMap() {
             ymaps.ready(function() {
                 map = new ymaps.Map("map", {
@@ -773,18 +818,138 @@
                     });
                     
                     placemark.events.add('click', () => {
-                        expandLot(obj.id);
-                        // Если карта свёрнута - развернуть
-                        const container = document.getElementById('map-container');
-                        if (container.classList.contains('collapsed')) {
-                            toggleMap();
-                        }
+                        showLotDetail(obj.id);
                     });
                     
                     map.geoObjects.add(placemark);
                     placemarks.push(placemark);
                 }
             });
+        }
+
+        // ============================================
+        // НАВИГАЦИЯ МЕЖДУ СТРАНИЦАМИ
+        // ============================================
+        
+        function showMainPage() {
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('lotDetailPage').style.display = 'none';
+            currentLotId = null;
+        }
+        
+        function showLotDetail(lotId) {
+            const lot = objects.find(o => o.id === lotId);
+            if (!lot) return;
+            
+            currentLotId = lotId;
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('lotDetailPage').style.display = 'block';
+            
+            renderLotDetail(lot);
+        }
+        
+        function renderLotDetail(lot) {
+            const container = document.getElementById('lotDetailContent');
+            const canEdit = checkPermission('edit');
+            const canDelete = checkPermission('delete');
+            
+            let imagesHtml = '';
+            if (lot.images && lot.images.length > 0) {
+                imagesHtml = '<div class="image-preview-grid">';
+                lot.images.forEach(img => {
+                    imagesHtml += `
+                        <div class="image-preview-item">
+                            <img src="${img.data}" alt="photo">
+                        </div>
+                    `;
+                });
+                imagesHtml += '</div>';
+            }
+            
+            container.innerHTML = `
+                <h2 style="color: white; margin-bottom: 20px;">${lot.address}</h2>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Адрес</label>
+                        <input type="text" id="detail_address" value="${lot.address}">
+                    </div>
+                    <div class="form-group">
+                        <label>Тип сделки</label>
+                        <select id="detail_dealType">
+                            <option value="Продажа" ${lot.dealType === 'Продажа' ? 'selected' : ''}>Продажа</option>
+                            <option value="Аренда" ${lot.dealType === 'Аренда' ? 'selected' : ''}>Аренда</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Категория</label>
+                        <select id="detail_category">
+                            <option value="Склад" ${lot.category === 'Склад' ? 'selected' : ''}>Склад</option>
+                            <option value="Производственный цех" ${lot.category === 'Производственный цех' ? 'selected' : ''}>Цех</option>
+                            <option value="Земельный участок" ${lot.category === 'Земельный участок' ? 'selected' : ''}>Участок</option>
+                            <option value="Ангар" ${lot.category === 'Ангар' ? 'selected' : ''}>Ангар</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Класс</label>
+                        <select id="detail_class">
+                            <option value="A" ${lot.warehouseClass === 'A' ? 'selected' : ''}>A</option>
+                            <option value="B" ${lot.warehouseClass === 'B' ? 'selected' : ''}>B</option>
+                            <option value="C" ${lot.warehouseClass === 'C' ? 'selected' : ''}>C</option>
+                            <option value="Не применимо" ${lot.warehouseClass === 'Не применимо' ? 'selected' : ''}>Не применимо</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Высота (м)</label>
+                        <input type="text" id="detail_height" value="${lot.height}">
+                    </div>
+                    <div class="form-group">
+                        <label>Нагрузка (кг/м²)</label>
+                        <input type="text" id="detail_load" value="${lot.floorLoad}">
+                    </div>
+                    <div class="form-group">
+                        <label>Площадь (м²)</label>
+                        <input type="text" id="detail_area" value="${lot.area}">
+                    </div>
+                    <div class="form-group">
+                        <label>Цена (₽)</label>
+                        <input type="text" id="detail_price" value="${lot.price}">
+                    </div>
+                    <div class="form-group">
+                        <label>Электричество (кВт)</label>
+                        <input type="text" id="detail_power" value="${lot.power}">
+                    </div>
+                    <div class="form-group">
+                        <label>Ворота</label>
+                        <input type="text" id="detail_gates" value="${lot.gates}">
+                    </div>
+                    <div class="form-group">
+                        <label>Высота ворот (м)</label>
+                        <input type="text" id="detail_gateHeight" value="${lot.gateHeight}">
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Комментарий</label>
+                        <textarea id="detail_comment" rows="3">${lot.comment}</textarea>
+                    </div>
+                </div>
+                
+                <div class="image-upload-area" onclick="document.getElementById('detail_fileInput').click()">
+                    <input type="file" id="detail_fileInput" accept="image/*" multiple style="display: none;" 
+                           onchange="handleDetailImageUpload(event)">
+                    <p><i class="fas fa-cloud-upload-alt"></i> Добавить фото</p>
+                </div>
+                <div id="detail_preview" class="image-preview-grid">${imagesHtml}</div>
+                
+                <div class="lot-actions">
+                    ${canEdit ? 
+                        `<button class="btn" onclick="saveLotDetail(${lot.id})"><i class="fas fa-save"></i> Сохранить</button>` : ''}
+                    ${canDelete ? 
+                        `<button class="btn-danger" onclick="deleteLot(${lot.id})"><i class="fas fa-trash"></i> Удалить</button>` : ''}
+                    <button class="btn-outline" onclick="generatePDF(${lot.id})">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </button>
+                </div>
+            `;
         }
 
         // ============================================
@@ -815,7 +980,7 @@
                 document.getElementById('userNameDisplay').innerHTML = `<i class="fas fa-user"></i> ${currentUser.name}`;
                 
                 await loadData();
-                // Карта инициализируется только при первом открытии
+                initMap();
             } else {
                 document.getElementById('loginError').innerHTML = 'Неверный логин или пароль';
             }
@@ -845,150 +1010,17 @@
         }
 
         // ============================================
-        // ОТОБРАЖЕНИЕ ОБЪЕКТОВ (СПИСКОМ)
+        // ФИЛЬТРАЦИЯ
         // ============================================
         
-        function renderObjects(lots) {
-            const container = document.getElementById('objectsList');
-            let html = '';
-            
-            lots.forEach(lot => {
-                const isExpanded = expandedLotId === lot.id;
-                const canEdit = checkPermission('edit');
-                const canDelete = checkPermission('delete');
-                
-                html += `
-                    <div class="object-item ${isExpanded ? 'expanded' : ''}">
-                        <div style="width: 100%;" onclick="${!isExpanded ? `expandLot(${lot.id})` : ''}">
-                            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-                                <div class="object-main">
-                                    <div class="object-badges">
-                                        <span class="badge ${lot.dealType === 'Продажа' ? 'sale' : 'rent'}">${lot.dealType}</span>
-                                        ${lot.warehouseClass !== 'Не применимо' ? 
-                                            `<span class="badge class-${lot.warehouseClass.toLowerCase()}">${lot.warehouseClass}</span>` : ''}
-                                    </div>
-                                    <div class="object-address">${lot.address}</div>
-                                    <div class="object-price">${Number(lot.price).toLocaleString()} ₽</div>
-                                </div>
-                                
-                                <div class="object-specs">
-                                    <div class="spec-item"><i class="fas fa-arrows-alt-v"></i> ${lot.height} м</div>
-                                    <div class="spec-item"><i class="fas fa-weight-hanging"></i> ${lot.floorLoad} кг/м²</div>
-                                    <div class="spec-item"><i class="fas fa-bolt"></i> ${lot.power} кВт</div>
-                                    <div class="spec-item"><i class="fas fa-vector-square"></i> ${lot.area} м²</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        ${isExpanded ? `
-                            <div class="edit-form">
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label>Адрес</label>
-                                        <input type="text" id="edit_address_${lot.id}" value="${lot.address}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Тип сделки</label>
-                                        <select id="edit_dealType_${lot.id}">
-                                            <option value="Продажа" ${lot.dealType === 'Продажа' ? 'selected' : ''}>Продажа</option>
-                                            <option value="Аренда" ${lot.dealType === 'Аренда' ? 'selected' : ''}>Аренда</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Категория</label>
-                                        <select id="edit_category_${lot.id}">
-                                            <option value="Склад" ${lot.category === 'Склад' ? 'selected' : ''}>Склад</option>
-                                            <option value="Производственный цех" ${lot.category === 'Производственный цех' ? 'selected' : ''}>Цех</option>
-                                            <option value="Земельный участок" ${lot.category === 'Земельный участок' ? 'selected' : ''}>Участок</option>
-                                            <option value="Ангар" ${lot.category === 'Ангар' ? 'selected' : ''}>Ангар</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Класс</label>
-                                        <select id="edit_class_${lot.id}">
-                                            <option value="A" ${lot.warehouseClass === 'A' ? 'selected' : ''}>A</option>
-                                            <option value="B" ${lot.warehouseClass === 'B' ? 'selected' : ''}>B</option>
-                                            <option value="C" ${lot.warehouseClass === 'C' ? 'selected' : ''}>C</option>
-                                            <option value="Не применимо" ${lot.warehouseClass === 'Не применимо' ? 'selected' : ''}>Не применимо</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Высота (м)</label>
-                                        <input type="text" id="edit_height_${lot.id}" value="${lot.height}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Нагрузка (кг/м²)</label>
-                                        <input type="text" id="edit_load_${lot.id}" value="${lot.floorLoad}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Площадь (м²)</label>
-                                        <input type="text" id="edit_area_${lot.id}" value="${lot.area}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Цена (₽)</label>
-                                        <input type="text" id="edit_price_${lot.id}" value="${lot.price}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Электричество (кВт)</label>
-                                        <input type="text" id="edit_power_${lot.id}" value="${lot.power}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Ворота</label>
-                                        <input type="text" id="edit_gates_${lot.id}" value="${lot.gates}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Высота ворот (м)</label>
-                                        <input type="text" id="edit_gateHeight_${lot.id}" value="${lot.gateHeight}">
-                                    </div>
-                                    <div class="form-group" style="grid-column: span 2;">
-                                        <label>Комментарий</label>
-                                        <textarea id="edit_comment_${lot.id}" rows="2">${lot.comment}</textarea>
-                                    </div>
-                                </div>
-
-                                <div class="image-upload-area" onclick="document.getElementById('fileInput_${lot.id}').click()">
-                                    <input type="file" id="fileInput_${lot.id}" accept="image/*" multiple style="display: none;" 
-                                           onchange="handleImageUpload(event, ${lot.id})">
-                                    <p><i class="fas fa-cloud-upload-alt"></i> Добавить фото</p>
-                                </div>
-                                <div id="preview_${lot.id}" class="image-preview-grid"></div>
-
-                                <div class="lot-actions">
-                                    ${canEdit ? 
-                                        `<button class="btn" onclick="saveLot(${lot.id})"><i class="fas fa-save"></i> Сохранить</button>` : ''}
-                                    ${canDelete ? 
-                                        `<button class="btn-danger" onclick="deleteLot(${lot.id})"><i class="fas fa-trash"></i> Удалить</button>` : ''}
-                                    <button class="btn-outline" onclick="generatePDF(${lot.id})">
-                                        <i class="fas fa-file-pdf"></i> PDF
-                                    </button>
-                                    <button class="btn-outline" onclick="collapseLot()">
-                                        <i class="fas fa-times"></i> Закрыть
-                                    </button>
-                                </div>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-
-        function expandLot(id) {
-            expandedLotId = id;
-            renderObjects(objects);
-        }
-
-        function collapseLot() {
-            expandedLotId = null;
-            renderObjects(objects);
-        }
-
         function filterLots() {
             const search = document.getElementById('searchInput').value.toLowerCase();
             const type = document.getElementById('filterType').value;
             const category = document.getElementById('filterCategory').value;
             const lotClass = document.getElementById('filterClass').value;
+            const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+            const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+            const minArea = parseFloat(document.getElementById('minArea').value) || 0;
             
             const filtered = objects.filter(obj => {
                 const matchesSearch = obj.address.toLowerCase().includes(search) ||
@@ -996,11 +1028,61 @@
                 const matchesType = type === 'all' || obj.dealType === type;
                 const matchesCategory = category === 'all' || obj.category === category;
                 const matchesClass = lotClass === 'all' || obj.warehouseClass === lotClass;
-                return matchesSearch && matchesType && matchesCategory && matchesClass;
+                const matchesPrice = parseFloat(obj.price) >= minPrice && parseFloat(obj.price) <= maxPrice;
+                const matchesArea = parseFloat(obj.area) >= minArea;
+                
+                return matchesSearch && matchesType && matchesCategory && matchesClass && matchesPrice && matchesArea;
             });
             
             renderObjects(filtered);
-            updateMapMarkers(filtered);
+            updateMapMarkers();
+        }
+        
+        function resetFilters() {
+            document.getElementById('filterType').value = 'all';
+            document.getElementById('filterCategory').value = 'all';
+            document.getElementById('filterClass').value = 'all';
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+            document.getElementById('minArea').value = '';
+            document.getElementById('searchInput').value = '';
+            filterLots();
+        }
+
+        // ============================================
+        // ОТОБРАЖЕНИЕ ОБЪЕКТОВ
+        // ============================================
+        
+        function renderObjects(lots) {
+            const container = document.getElementById('objectsList');
+            let html = '';
+            
+            lots.forEach(lot => {
+                html += `
+                    <div class="object-item" onclick="showLotDetail(${lot.id})">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; width: 100%;">
+                            <div class="object-main">
+                                <div class="object-badges">
+                                    <span class="badge ${lot.dealType === 'Продажа' ? 'sale' : 'rent'}">${lot.dealType}</span>
+                                    ${lot.warehouseClass !== 'Не применимо' ? 
+                                        `<span class="badge class-${lot.warehouseClass.toLowerCase()}">${lot.warehouseClass}</span>` : ''}
+                                </div>
+                                <div class="object-address">${lot.address}</div>
+                                <div class="object-price">${Number(lot.price).toLocaleString()} ₽</div>
+                            </div>
+                            
+                            <div class="object-specs">
+                                <div class="spec-item"><i class="fas fa-arrows-alt-v"></i> ${lot.height} м</div>
+                                <div class="spec-item"><i class="fas fa-weight-hanging"></i> ${lot.floorLoad} кг/м²</div>
+                                <div class="spec-item"><i class="fas fa-bolt"></i> ${lot.power} кВт</div>
+                                <div class="spec-item"><i class="fas fa-vector-square"></i> ${lot.area} м²</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
         }
 
         function createNewLot() {
@@ -1038,11 +1120,11 @@
             
             objects.push(newLot);
             renderObjects(objects);
-            expandLot(newLot.id);
             updateMapMarkers();
+            showLotDetail(newLot.id);
         }
 
-        function saveLot(id) {
+        function saveLotDetail(id) {
             if (!checkPermission('edit')) {
                 alert('У вас нет прав на редактирование');
                 return;
@@ -1051,22 +1133,22 @@
             const lot = objects.find(o => o.id === id);
             if (!lot) return;
             
-            lot.address = document.getElementById(`edit_address_${id}`).value;
-            lot.dealType = document.getElementById(`edit_dealType_${id}`).value;
-            lot.category = document.getElementById(`edit_category_${id}`).value;
-            lot.warehouseClass = document.getElementById(`edit_class_${id}`).value;
-            lot.height = document.getElementById(`edit_height_${id}`).value;
-            lot.floorLoad = document.getElementById(`edit_load_${id}`).value;
-            lot.area = document.getElementById(`edit_area_${id}`).value;
-            lot.price = document.getElementById(`edit_price_${id}`).value;
-            lot.power = document.getElementById(`edit_power_${id}`).value;
-            lot.gates = document.getElementById(`edit_gates_${id}`).value;
-            lot.gateHeight = document.getElementById(`edit_gateHeight_${id}`).value;
-            lot.comment = document.getElementById(`edit_comment_${id}`).value;
+            lot.address = document.getElementById('detail_address').value;
+            lot.dealType = document.getElementById('detail_dealType').value;
+            lot.category = document.getElementById('detail_category').value;
+            lot.warehouseClass = document.getElementById('detail_class').value;
+            lot.height = document.getElementById('detail_height').value;
+            lot.floorLoad = document.getElementById('detail_load').value;
+            lot.area = document.getElementById('detail_area').value;
+            lot.price = document.getElementById('detail_price').value;
+            lot.power = document.getElementById('detail_power').value;
+            lot.gates = document.getElementById('detail_gates').value;
+            lot.gateHeight = document.getElementById('detail_gateHeight').value;
+            lot.comment = document.getElementById('detail_comment').value;
             
             renderObjects(objects);
             updateMapMarkers();
-            collapseLot();
+            showMainPage();
         }
 
         function deleteLot(id) {
@@ -1079,13 +1161,13 @@
                 objects = objects.filter(o => o.id !== id);
                 renderObjects(objects);
                 updateMapMarkers();
-                if (expandedLotId === id) collapseLot();
+                showMainPage();
             }
         }
 
-        function handleImageUpload(event, lotId) {
+        function handleDetailImageUpload(event) {
             const files = event.target.files;
-            const previewDiv = document.getElementById(`preview_${lotId}`);
+            const previewDiv = document.getElementById('detail_preview');
             
             for (let i = 0; i < files.length; i++) {
                 const reader = new FileReader();
@@ -1185,12 +1267,11 @@
                 document.getElementById('userNameDisplay').innerHTML = `<i class="fas fa-user"></i> ${currentUser.name}`;
                 
                 await loadData();
-                // Карта инициализируется только при первом открытии через кнопку
+                initMap();
             } else {
                 document.getElementById('loginSection').style.display = 'block';
             }
             
-            // Показываем/скрываем кнопку создания
             document.getElementById('createBtn').style.display = 
                 checkPermission('create') ? 'inline-block' : 'none';
         })();
